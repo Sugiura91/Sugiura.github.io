@@ -127,8 +127,8 @@
     <h2>Phase de révélation</h2>
     <p id="revealbis" style="display:none;">Voici comment les rôles et les mots ont été attribués à chaque joueur dans cette partie :</p>
     <ul id="revealList"></ul>
-    <div id="revealButtons" style="display: none; display: flex; justify-content: center; gap: 1em; margin-top: 1em;">
-      <button onclick="mainMenu()">Retour accueil</button>
+    <div id="revealButtons" style="display: none; justify-content: center; gap: 1em; margin-top: 1em;">
+      <button onclick="mainMenu()">← Retour accueil</button>
       <button id="replayButton" onclick="restartGame()">Rejouer</button>
     </div>
   </div>
@@ -329,6 +329,7 @@
     function hideRole() {
       clearInterval(timer);
       const currentName = playerNames[playerNumber - 1];
+      document.getElementById("revealButtons").style.display = "none";
       document.getElementById("players").innerText = "";
       document.getElementById("word").innerText = "⬛⬛⬛";
       document.getElementById("info").innerText = `Passe l'appareil à ${currentName}`;
