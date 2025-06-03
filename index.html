@@ -80,7 +80,7 @@
     <input type="number" id="displayDuration" min="3" max="30" value="10"/>
     <div style="display: flex; justify-content: space-between; gap: 1em;">
       <button onclick="openOptions()">Options</button>
-      <button onclick="prepareNames()">Suivant</button>
+      <button onclick="prepareNames()">Nouvelle partie</button>
     </div>
   </div>
 
@@ -90,17 +90,17 @@
     <div style="display: flex; gap: 2em;">
       <div style="flex: 1;">
         <h3>Mots des disciples</h3>
-        <textarea id="discipleWordsInput" rows="10" style="width: 100%;"></textarea>
+        <textarea id="discipleWordsInput" rows="25" style="width: 100%;"></textarea>
       </div>
       <div style="flex: 1;">
         <h3>Mots des infiltrés</h3>
-        <textarea id="infiltréWordsInput" rows="10" style="width: 100%;"></textarea>
+        <textarea id="infiltréWordsInput" rows="25" style="width: 100%;"></textarea>
       </div>
     </div>
   
     <div style="margin-top: 1em; display: flex; justify-content: center; gap: 1em;">
-      <button onclick="restoreDefaultWords()">Restaurer les mots par défaut</button>
-      <button onclick="saveOptions()">Sauvegarder</button>
+      <button onclick="restoreDefaultWords()">Restaurer par défaut</button>
+      <button onclick="saveOptions()">Retour accueil</button>
     </div>
   </div>
   
