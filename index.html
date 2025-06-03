@@ -78,8 +78,30 @@
 
     <p>⏳ Temps d'affichage du rôle :</p>
     <input type="number" id="displayDuration" min="3" max="30" value="10"/>
-    <br/>
-    <button onclick="prepareNames()">Suivant</button>
+    <div style="display: flex; justify-content: space-between; gap: 1em;">
+      <button onclick="openOptions()">Options</button>
+      <button onclick="prepareNames()">Suivant</button>
+    </div>
+  </div>
+
+  <div id="options" style="display: none;">
+  <h2>Modifier les mots</h2>
+
+    <div style="display: flex; gap: 2em;">
+      <div style="flex: 1;">
+        <h3>Mots des disciples</h3>
+        <textarea id="discipleWordsInput" rows="10" style="width: 100%;"></textarea>
+      </div>
+      <div style="flex: 1;">
+        <h3>Mots des infiltrés</h3>
+        <textarea id="infiltréWordsInput" rows="10" style="width: 100%;"></textarea>
+      </div>
+    </div>
+  
+    <div style="margin-top: 1em; display: flex; justify-content: center; gap: 1em;">
+      <button onclick="restoreDefaultWords()">Restaurer les mots par défaut</button>
+      <button onclick="saveOptions()">Sauvegarder</button>
+    </div>
   </div>
   
   <div id="names" style="display:none;">
@@ -105,9 +127,11 @@
   </div>
 
   <script>
-    const discipleWords = ["Chat", "Avion", "Bouteille", "Lune", "Arbre", "Marteau", "Nuage", "Fromage", "Serpent", "Radio", "Pluie", "Téléphone", "Montagne", "Papier", "Électricité", "Requin", "Chaise", "Chocolat", "Feu", "Robot"];
-    const infiltréWords = ["Tigre", "Hélicoptère", "Carafe", "Soleil", "Buisson", "Tournevis", "Fumée", "Yaourt", "Anguille", "Enceinte", "Neige", "Talkie-walkie", "Colline", "Carton", "Magnétisme", "Dauphin", "Fauteuil", "Nutella", "Braise", "Cyborg"];
+    const defaultDiscipleWords = ["Chat", "Avion", "Bouteille", "Lune", "Arbre", "Marteau", "Nuage", "Fromage", "Serpent", "Radio", "Pluie", "Téléphone", "Montagne", "Papier", "Électricité", "Requin", "Chaise", "Chocolat", "Feu", "Robot"];
+    const defaultInfiltréWords = ["Tigre", "Hélicoptère", "Carafe", "Soleil", "Buisson", "Tournevis", "Fumée", "Yaourt", "Anguille", "Enceinte", "Neige", "Talkie-walkie", "Colline", "Carton", "Magnétisme", "Dauphin", "Fauteuil", "Nutella", "Braise", "Cyborg"];
     const journalisteMessage = "❌ Aucun mot ❌ ";
+    let discipleWords = [...defaultDiscipleWords];
+    let infiltréWords = [...defaultInfiltréWords];
 
     let rolesPool = [];
     let motSecret = "";
@@ -132,6 +156,38 @@
       }
     }
 
+    function openOptions() {
+      document.getElementById("start").style.display = "none";
+      document.getElementById("options").style.display = "block";
+    
+      document.getElementById("discipleWordsInput").value = discipleWords.join("\n");
+      document.getElementById("infiltréWordsInput").value = infiltréWords.join("\n");
+    }
+    
+    function saveOptions() {
+      const discipleText = document.getElementById("discipleWordsInput").value.trim();
+      const infiltréText = document.getElementById("infiltréWordsInput").value.trim();
+    
+      discipleWords = discipleText.split("\n").map(w => w.trim()).filter(w => w.length > 0);
+      infiltréWords = infiltréText.split("\n").map(w => w.trim()).filter(w => w.length > 0);
+    
+      if (discipleWords.length !== infiltréWords.length) {
+        alert("Les deux listes doivent contenir exactement le même nombre de mots !");
+        return;
+      }
+    
+      document.getElementById("options").style.display = "none";
+      document.getElementById("start").style.display = "block";
+    }
+    
+    function restoreDefaultWords() {
+      discipleWords = [...defaultDiscipleWords];
+      infiltréWords = [...defaultInfiltréWords];
+    
+      document.getElementById("discipleWordsInput").value = discipleWords.join("\n");
+      document.getElementById("infiltréWordsInput").value = infiltréWords.join("\n");
+    }
+    
     function prepareNames() {
       const totalPlayers = parseInt(document.getElementById("playerCount").value);
       const spyCount = parseInt(document.getElementById("spyCount").value);
