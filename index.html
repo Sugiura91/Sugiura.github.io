@@ -127,7 +127,10 @@
     <h2>Phase de révélation</h2>
     <p id="revealbis" style="display:none;">Voici comment les rôles et les mots ont été attribués à chaque joueur dans cette partie :</p>
     <ul id="revealList"></ul>
-    <button id="replayButton" style="display:none;" onclick="restartGame()">Rejouer</button>
+    <div id="revealButtons" style="display: none; display: flex; justify-content: center; gap: 1em; margin-top: 1em;">
+      <button onclick="mainMenu()">Retour accueil</button>
+      <button id="replayButton" onclick="restartGame()">Rejouer</button>
+    </div>
   </div>
 
   <script>
@@ -193,8 +196,19 @@
     }
 
     function mainMenu() {
+      // Cache tous les écrans
+      document.getElementById("reveal").style.display = "none";
+      document.getElementById("setup").style.display = "none";
       document.getElementById("names").style.display = "none";
+      document.getElementById("options").style.display = "none";
+    
+      // Affiche l'accueil
       document.getElementById("start").style.display = "block";
+    
+      // Remet à zéro l'état d'affichage
+      document.getElementById("revealButtons").style.display = "none";
+      document.getElementById("replayButton").style.display = "none";
+      document.getElementById("revealList").innerHTML = "";
     }
     
     function prepareNames() {
@@ -349,6 +363,7 @@
       const oldRevealBtn = document.querySelector("#reveal button:not(#replayButton)");
         if (oldRevealBtn) oldRevealBtn.remove();
       document.getElementById("replayButton").style.display = "inline-block";
+      document.getElementById("revealButtons").style.display = "flex";
       
     }
     
