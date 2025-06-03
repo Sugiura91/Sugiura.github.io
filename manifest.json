@@ -1,6 +1,6 @@
 {
   "name": "Little Secret",
-  "short_name": "Secret",
+  "short_name": "Little Secret",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f2f2f2",
