@@ -1,0 +1,8 @@
+{
+  "name": "Little Secret",
+  "short_name": "Secret",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f2f2f2",
+  "theme_color": "#f2f2f2"
+}
