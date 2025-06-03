@@ -127,7 +127,10 @@
     <h2>Phase de révélation</h2>
     <p id="revealbis" style="display:none;">Voici comment les rôles et les mots ont été attribués à chaque joueur dans cette partie :</p>
     <ul id="revealList"></ul>
-    <button id="replayButton" style="display:none;" onclick="restartGame()">Rejouer</button>
+    <div style="margin-top: 1em; display: flex; justify-content: center; gap: 1em;">
+      <button id="menuButton" style="display:none;" onclick="mainMenu()">Retour accueil</button>
+      <button id="replayButton" style="display:none;" onclick="restartGame()">Rejouer</button>
+    </div>
   </div>
 
   <script>
@@ -349,7 +352,9 @@
       });
       const oldRevealBtn = document.querySelector("#reveal button:not(#replayButton)");
         if (oldRevealBtn) oldRevealBtn.remove();
+      document.getElementById("menuButton").style.display = "inline-block";
       document.getElementById("replayButton").style.display = "inline-block";
+      
     }
     
     function restartGame() {
