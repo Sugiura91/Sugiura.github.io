@@ -128,7 +128,7 @@
     <p id="revealbis" style="display:none;">Voici comment les rôles et les mots ont été attribués à chaque joueur dans cette partie :</p>
     <ul id="revealList"></ul>
     <div id="revealButtons" style="display: none; justify-content: center; gap: 1em; margin-top: 1em;">
-      <button onclick="mainMenu()">← Retour accueil</button>
+      <button onclick="mainMenu()">Retour accueil</button>
       <button id="replayButton" onclick="restartGame()">Rejouer</button>
     </div>
   </div>
@@ -275,7 +275,8 @@
       if (!showing) {
         if (rolesPool.length === 0) {
           document.getElementById("setup").style.display = "none";
-          document.getElementById("reveal").style.display = "block";
+          document.getElementById("reveal").style.display = "block";          
+          document.getElementById("revealButtons").style.display = "none";
           document.getElementById("revealList").innerHTML = "<li>✅ Tous les rôles ont été distribués. Cliquez sur le bouton ci-dessous pour révéler les rôles.</li>";
           document.getElementById("revealList").style.fontWeight = "bold";
           const revealBtn = document.createElement("button");
@@ -329,7 +330,6 @@
     function hideRole() {
       clearInterval(timer);
       const currentName = playerNames[playerNumber - 1];
-      document.getElementById("revealButtons").style.display = "none";
       document.getElementById("players").innerText = "";
       document.getElementById("word").innerText = "⬛⬛⬛";
       document.getElementById("info").innerText = `Passe l'appareil à ${currentName}`;
@@ -339,6 +339,7 @@
       if (rolesPool.length === 0) {
         document.getElementById("setup").style.display = "none";
         document.getElementById("reveal").style.display = "block";
+        document.getElementById("revealButtons").style.display = "none";
         document.getElementById("revealList").innerHTML = "<li>✅ Tous les mots ont été attribués. Cliquez sur le bouton ci-dessous pour révéler les rôles.</li>";
         document.getElementById("revealList").style.fontWeight = "bold";
         const revealBtn = document.createElement("button");
@@ -363,7 +364,6 @@
       });
       const oldRevealBtn = document.querySelector("#reveal button:not(#replayButton)");
         if (oldRevealBtn) oldRevealBtn.remove();
-      document.getElementById("replayButton").style.display = "inline-block";
       document.getElementById("revealButtons").style.display = "flex";
       
     }
