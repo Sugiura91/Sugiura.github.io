@@ -78,6 +78,7 @@
 
     <p>⏳ Temps d'affichage du rôle :</p>
     <input type="number" id="displayDuration" min="3" max="30" value="10"/>
+    
     <div style="display: flex; justify-content: space-between; gap: 1em;">
       <button onclick="openOptions()">Options</button>
       <button onclick="prepareNames()">Nouvelle partie</button>
@@ -107,7 +108,10 @@
   <div id="names" style="display:none;">
     <h2>Entrez le nom des joueurs</h2>
     <form id="namesForm"></form>
-    <button onclick="submitNames()">Démarrer la partie</button>
+    <div style="margin-top: 1em; display: flex; justify-content: center; gap: 1em;">
+      <button onclick="mainMenu()">Retour accueil</button>
+      <button onclick="submitNames()">Démarrer la partie</button>
+    </div>
   </div>
 
   <div id="setup">
@@ -186,6 +190,12 @@
     
       document.getElementById("discipleWordsInput").value = discipleWords.join("\n");
       document.getElementById("infiltréWordsInput").value = infiltréWords.join("\n");
+    }
+
+    function mainMenu() {
+      document.getElementById("names").style.display = "none";
+      document.getElementById("reveal").style.display = "none";
+      document.getElementById("start").style.display = "block";
     }
     
     function prepareNames() {
