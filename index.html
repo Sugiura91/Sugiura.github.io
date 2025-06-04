@@ -135,20 +135,26 @@
   <div id="options" style="display: none;">
   <h2>Modifier les mots</h2>
 
-    <div style="display: flex; gap: 1em;">
+    <label for="difficultySelect">Choisir la difficulté :</label>
+    <select id="difficultySelect" onchange="updateWordEditor()">
+      <option value="facile">Facile</option>
+      <option value="intermédiaire">Intermédiaire</option>
+      <option value="difficile">Difficile</option>
+      <option value="personnalisée">Personnalisée</option>
+    </select>
+    <div style="display: flex; gap: 1em; margin-top: 1em;">
       <div style="flex: 1;">
         <h3>Disciples</h3>
-        <textarea id="discipleWordsInput" rows="25" style="width: 90%;"></textarea>
+        <textarea id="discipleWordsInput" rows="20" style="width: 90%;"></textarea>
       </div>
       <div style="flex: 1;">
         <h3>Infiltrés</h3>
-        <textarea id="infiltréWordsInput" rows="25" style="width: 90%;"></textarea>
+        <textarea id="infiltréWordsInput" rows="20" style="width: 90%;"></textarea>
       </div>
     </div>
-  
+    
     <div style="margin-top: 1em; display: flex; justify-content: center; gap: 1em;">
-      <button onclick="restoreDefaultWords()">Restaurer par défaut</button>
-      <button onclick="saveOptions()">Retour accueil</button>
+      <button onclick="saveOptions()">Sauvegarder</button>
     </div>
   </div>
   
@@ -181,11 +187,27 @@
   </div>
 
   <script>
-    const defaultDiscipleWords = ["Chat", "Avion", "Bouteille", "Lune", "Arbre", "Marteau", "Nuage", "Fromage", "Serpent", "Radio", "Pluie", "Téléphone", "Montagne", "Papier", "Électricité", "Requin", "Chaise", "Chocolat", "Feu", "Robot"];
-    const defaultInfiltréWords = ["Tigre", "Hélicoptère", "Carafe", "Soleil", "Buisson", "Tournevis", "Fumée", "Yaourt", "Anguille", "Enceinte", "Neige", "Talkie-walkie", "Colline", "Carton", "Magnétisme", "Dauphin", "Fauteuil", "Nutella", "Braise", "Cyborg"];
+    const wordLists = {
+      facile: {
+        disciples: ["Chat", "Avion", "Bouteille", "Lune", "Arbre", "Marteau", "Nuage", "Fromage", "Serpent", "Radio", "Pluie", "Téléphone", "Montagne", "Papier", "Électricité", "Requin", "Chaise", "Chocolat", "Feu", "Robot"],
+        infiltrees: ["Tigre", "Hélicoptère", "Carafe", "Soleil", "Buisson", "Tournevis", "Fumée", "Yaourt", "Anguille", "Enceinte", "Neige", "Talkie-walkie", "Colline", "Carton", "Magnétisme", "Dauphin", "Fauteuil", "Nutella", "Braise", "Cyborg"]
+      },
+      intermédiaire: {
+        disciples: ["Musique", "Banque", "Montagne", "Ordinateur", "Plage"],
+        infiltrees: ["Chanson", "Argent", "Colline", "Écran", "Sable"]
+      },
+      difficile: {
+        disciples: ["Métaphore", "Abstraction", "Éthique", "Philosophie", "Conscience"],
+        infiltrees: ["Comparaison", "Concret", "Morale", "Idéologie", "Subconscient"]
+      },
+      personnalisée: {
+        disciples: [],
+        infiltrees: []
+      }
+    };
+    
+    let selectedDifficulty = "facile";
     const journalisteMessage = "❌ Aucun mot ❌ ";
-    let discipleWords = [...defaultDiscipleWords];
-    let infiltréWords = [...defaultInfiltréWords];
 
     let rolesPool = [];
     let motSecret = "";
@@ -214,25 +236,38 @@
       document.getElementById("start").style.display = "none";
       document.getElementById("options").style.display = "block";
     
-      document.getElementById("discipleWordsInput").value = discipleWords.join("\n");
-      document.getElementById("infiltréWordsInput").value = infiltréWords.join("\n");
+      document.getElementById("difficultySelect").value = selectedDifficulty;
+      updateWordEditor();
+    }
+    
+    function updateWordEditor() {
+      selectedDifficulty = document.getElementById("difficultySelect").value;
+    
+      const discipleArea = document.getElementById("discipleWordsInput");
+      const infilArea = document.getElementById("infiltréWordsInput");
+    
+      const list = wordLists[selectedDifficulty];
+    
+      discipleArea.value = list.disciples.join("\n");
+      infilArea.value = list.infiltrees.join("\n");
+    
+      const editable = selectedDifficulty === "personnalisée";
+      discipleArea.disabled = !editable;
+      infilArea.disabled = !editable;
     }
     
     function saveOptions() {
-      const discipleText = document.getElementById("discipleWordsInput").value.trim();
-      const infiltréText = document.getElementById("infiltréWordsInput").value.trim();
+      if (selectedDifficulty === "personnalisée") {
+        const discipleText = document.getElementById("discipleWordsInput").value.trim();
+        const infilText = document.getElementById("infiltréWordsInput").value.trim();
     
-      discipleWords = discipleText.split("\n").map(w => w.trim()).filter(w => w.length > 0);
-      infiltréWords = infiltréText.split("\n").map(w => w.trim()).filter(w => w.length > 0);
+        wordLists.personnalisée.disciples = discipleText.split("\n").map(w => w.trim()).filter(w => w);
+        wordLists.personnalisée.infiltrees = infilText.split("\n").map(w => w.trim()).filter(w => w);
     
-      if (discipleWords.length !== infiltréWords.length) {
-        alert("Les deux listes doivent contenir exactement le même nombre de mots !");
-        return;
+        // Sauvegarde locale
+        localStorage.setItem("customDisciples", JSON.stringify(wordLists.personnalisée.disciples));
+        localStorage.setItem("customInfiltrees", JSON.stringify(wordLists.personnalisée.infiltrees));
       }
-    
-      // 🔐 Sauvegarde dans le navigateur
-      localStorage.setItem("discipleWords", JSON.stringify(discipleWords));
-      localStorage.setItem("infiltréWords", JSON.stringify(infiltréWords));
     
       document.getElementById("options").style.display = "none";
       document.getElementById("start").style.display = "block";
@@ -288,9 +323,10 @@
       shuffleArray(rolesPool);
       allRoles = [...rolesPool];
     
-      const index = Math.floor(Math.random() * discipleWords.length);
-      motSecret = discipleWords[index];
-      motPiege = infiltréWords[index];
+      const list = wordLists[selectedDifficulty];
+      const index = Math.floor(Math.random() * list.disciples.length);
+      motSecret = list.disciples[index];
+      motPiege = list.infiltrees[index];
     }
 
     let playerNames = [];
@@ -437,9 +473,10 @@
       rolesPool = [...allRoles];
     
       // Rechoisit un mot correspondant à l'index commun
-      const index = Math.floor(Math.random() * discipleWords.length);
-      motSecret = discipleWords[index];
-      motPiege = infiltréWords[index];
+      const list = wordLists[selectedDifficulty];
+      const index = Math.floor(Math.random() * list.disciples.length);
+      motSecret = list.disciples[index];
+      motPiege = list.infiltrees[index];
     
       // Affiche l'écran de distribution
       const currentName = playerNames[playerNumber - 1];
@@ -454,18 +491,13 @@
     }
     
     window.onload = function () {
-      const savedDisciples = localStorage.getItem("discipleWords");
-      const savedInfiltrés = localStorage.getItem("infiltréWords");
-    
-      if (savedDisciples && savedInfiltrés) {
+      const savedCustomD = localStorage.getItem("customDisciples");
+      const savedCustomI = localStorage.getItem("customInfiltrees");
+      
+      if (savedCustomD && savedCustomI) {
         try {
-          const parsedD = JSON.parse(savedDisciples);
-          const parsedI = JSON.parse(savedInfiltrés);
-    
-          if (Array.isArray(parsedD) && Array.isArray(parsedI) && parsedD.length === parsedI.length) {
-            discipleWords = parsedD;
-            infiltréWords = parsedI;
-          }
+          wordLists.personnalisée.disciples = JSON.parse(savedCustomD);
+          wordLists.personnalisée.infiltrees = JSON.parse(savedCustomI);
         } catch (e) {
           console.warn("Erreur lors du chargement des mots personnalisés", e);
         }
