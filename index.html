@@ -1,52 +1,103 @@
 
 <!DOCTYPE html>
 <html lang="fr">
-<link rel="manifest" href="manifest.json" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <head>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Little Secret - Mobile</title>
   <link rel="apple-touch-icon" href="icon.png" />
   <style>
     body {
-      font-family: Arial, sans-serif;
+      background-color: #111827;
+      color: #F3F4F6;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 20px;
       text-align: center;
-      padding: 40px;
-      background-color: #f2f2f2;
     }
-    #setup {
+      
+    h1, h2, h3 {
+      color: #60A5FA;
+      margin-bottom: 0.5em;
+    }
+    
+    input[type="number"] {
+        padding: 10px;
+        border-radius: 5px;
+        margin: 5px 0;
+        width: 45%;
+        font-size: 1em;
+        background-color: #1F2937;
+        color: #F3F4F6;
+        text-align: center;
+      }
+      
+      input[type="text"], textarea {
+              padding: 5px;
+              border-radius: 5px;
+              margin: 5px 0;
+              width: 45%;
+              font-size: 1em;
+              background-color: #111827;
+              color: #F3F4F6;
+              text-align: center;
+            }
+    
+      button {
+        padding: 10px 20px;
+        margin: 10px;
+        border-radius: 5px;
+        border: none;
+        background-color: #60A5FA;
+        color: #111827;
+        font-size: 1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+      }
+    
+      button.clicked {
+        background-color: #3B82F6 !important;
+        box-shadow: 0 0 10px #3B82F6aa;
+      }
+    
+      textarea {
+        resize: vertical;
+        min-height: 150px;
+      }
+      
+    #setup, #reveal {
       display: none;
+      max-width: 600px;
+      margin: auto;
+      background-color: #1F2937;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #00000088;
     }
-    #role, #players {
-      font-size: 1.8em;
-      margin: 10px;
-      color: #333;
+    #names, #options {
+      max-width: 600px;
+      margin: auto;
+      background-color: #1F2937;
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #00000088;
     }
-    #word {
-      font-size: 1.8em;
-      margin: 10px;
-      color: #3037C2;
-    }
-    button {
-      font-size: 1.2em;
-      padding: 10px 20px;
-      margin-top: 20px;
-    }
-    input[type=number] {
-      font-size: 1.2em;
-      padding: 5px;
-      width: 80px;
+
+    #role, #word, #players {
+      font-size: 2em;
+      margin-top: 10px;
+      font-weight: bold;
     }
     #timer {
-      font-size: 1.5em;
-      color: red;
+      color: #FBBF24;
+      font-weight: bold;
       margin-top: 10px;
     }
-    #reveal {
-      display: none;
-    }
+    
     ul {
       list-style-type: none;
       padding: 0;
@@ -55,11 +106,7 @@
       font-size: 1.4em;
       margin: 5px 0;
     }
-    ik {
-      font-size: 1.2em;
-      margin: 10px;
-      color: #333;
-    }
+    
   </style>
 </head>
 <body>
@@ -88,14 +135,14 @@
   <div id="options" style="display: none;">
   <h2>Modifier les mots</h2>
 
-    <div style="display: flex; gap: 2em;">
+    <div style="display: flex; gap: 1em;">
       <div style="flex: 1;">
-        <h3>Mots des disciples</h3>
-        <textarea id="discipleWordsInput" rows="25" style="width: 100%;"></textarea>
+        <h3>Disciples</h3>
+        <textarea id="discipleWordsInput" rows="25" style="width: 90%;"></textarea>
       </div>
       <div style="flex: 1;">
-        <h3>Mots des infiltrés</h3>
-        <textarea id="infiltréWordsInput" rows="25" style="width: 100%;"></textarea>
+        <h3>Infiltrés</h3>
+        <textarea id="infiltréWordsInput" rows="25" style="width: 90%;"></textarea>
       </div>
     </div>
   
@@ -108,6 +155,9 @@
   <div id="names" style="display:none;">
     <h2>Entrez le nom des joueurs</h2>
     <form id="namesForm"></form>
+    <div style="text-align: center; margin-bottom: 1em;">
+      <button onclick="clearSavedNames()">Effacer les noms enregistrés</button>
+    </div>
     <div style="margin-top: 1em; display: flex; justify-content: center; gap: 1em;">
       <button onclick="mainMenu()">Retour accueil</button>
       <button onclick="submitNames()">Démarrer la partie</button>
@@ -180,6 +230,10 @@
         return;
       }
     
+      // 🔐 Sauvegarde dans le navigateur
+      localStorage.setItem("discipleWords", JSON.stringify(discipleWords));
+      localStorage.setItem("infiltréWords", JSON.stringify(infiltréWords));
+    
       document.getElementById("options").style.display = "none";
       document.getElementById("start").style.display = "block";
     }
@@ -187,6 +241,9 @@
     function restoreDefaultWords() {
       discipleWords = [...defaultDiscipleWords];
       infiltréWords = [...defaultInfiltréWords];
+    
+      localStorage.removeItem("discipleWords");
+      localStorage.removeItem("infiltréWords");
     
       document.getElementById("discipleWordsInput").value = discipleWords.join("\n");
       document.getElementById("infiltréWordsInput").value = infiltréWords.join("\n");
@@ -210,10 +267,12 @@
     
       const nameForm = document.getElementById("namesForm");
       nameForm.innerHTML = "";
+      const savedNames = JSON.parse(localStorage.getItem("playerNames") || "[]");
     
       for (let i = 1; i <= totalPlayers; i++) {
+        const value = savedNames[i - 1] ? `value="${savedNames[i - 1]}"` : "";
         nameForm.innerHTML += `
-          <p>👤 Joueur ${i} : <input type="text" name="player${i}" required placeholder="Nom ou pseudo"></p>
+          <p>Joueur ${i} : <input type="text" name="player${i}" required placeholder="Nom ou pseudo" ${value}></p>
         `;
       }
     
@@ -246,6 +305,7 @@
           return;
         }
         playerNames.push(input.value.trim());
+        localStorage.setItem("playerNames", JSON.stringify(playerNames));
       }
 
       document.getElementById("names").style.display = "none";
@@ -256,8 +316,23 @@
       showing = false;
       playerNumber = 1;
     }
-
+    
+    function clearSavedNames() {
+      localStorage.removeItem("playerNames");
+    
+      const inputs = document.querySelectorAll("#namesForm input");
+      inputs.forEach(input => input.value = "");
+    }
+    
     function toggleRole() {
+      document.getElementById("toggleButton").disabled = true; // évite double clic
+      setTimeout(() => {
+        handleToggleClick();
+        document.getElementById("toggleButton").disabled = false;
+      }, 500); // délai de 500ms
+    }
+
+    function handleToggleClick() {
       if (!showing) {
         if (rolesPool.length === 0) {
           document.getElementById("setup").style.display = "none";
@@ -344,7 +419,7 @@
                    entry.role === "🫣 Infiltré" ? motPiege :
                    "Aucun";
         list.innerHTML += `<li>👤 ${entry.joueur}</li>`;
-        list.innerHTML += `<ik> ${entry.role} — ${word}</ik>`;
+        list.innerHTML += `<h3> ${entry.role} — ${word}</h3>`;
       });
       const oldRevealBtn = document.querySelector("#reveal button:not(#replayButton)");
         if (oldRevealBtn) oldRevealBtn.remove();
@@ -378,6 +453,31 @@
       document.getElementById("replayButton").style.display = "none";
     }
     
+    window.onload = function () {
+      const savedDisciples = localStorage.getItem("discipleWords");
+      const savedInfiltrés = localStorage.getItem("infiltréWords");
+    
+      if (savedDisciples && savedInfiltrés) {
+        try {
+          const parsedD = JSON.parse(savedDisciples);
+          const parsedI = JSON.parse(savedInfiltrés);
+    
+          if (Array.isArray(parsedD) && Array.isArray(parsedI) && parsedD.length === parsedI.length) {
+            discipleWords = parsedD;
+            infiltréWords = parsedI;
+          }
+        } catch (e) {
+          console.warn("Erreur lors du chargement des mots personnalisés", e);
+        }
+      }
+    };
+    
+    document.querySelectorAll("button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        btn.classList.add("clicked");
+        setTimeout(() => btn.classList.remove("clicked"), 150);
+      });
+    });
   </script>
 
 </body>
