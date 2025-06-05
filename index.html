@@ -9,6 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Little Secret - Mobile</title>
   <link rel="apple-touch-icon" href="icon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">
   <style>
     body {
       background-color: #111827;
@@ -18,7 +19,7 @@
       padding: 20px;
       text-align: center;
     }
-      
+    
     h1, h2, h3 {
       color: #60A5FA;
       margin-bottom: 0.5em;
@@ -91,6 +92,53 @@
         text-align-last: center;
       }
       
+    #intro {
+      height: 90vh;
+      width: 90vw;
+      background-color: #111827;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      font-family: 'Dancing Script', cursive;
+      color: #60A5FA;
+      text-align: center;
+      gap: 0;
+    }
+    
+    .title-word {
+      display: block;
+      line-height: 1;
+      position: relative;
+    }
+    
+    .title-word.little {
+      top: -1em;
+      left: -0.4em;
+      font-size: 6em;
+    }
+    
+    .title-word.secret {
+      top: -0.8em;
+      left: 0.4em;
+      font-size: 6em;
+    }
+  
+    .title-word.skip {
+      top: 3em;
+      font-size: 1.5em;
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { opacity: 0.9; }
+      50% { opacity: 0.2; }
+      100% { opacity: 0.9; }
+    }
+    
     #setup, #reveal {
       display: none;
       max-width: 600px;
@@ -133,8 +181,14 @@
 </head>
 <body>
 
-  <div id="start">
-    <h1>LITTLE SECRET</h1>
+  <div id="intro">
+    <span class="title-word little">Little</span>
+    <span class="title-word secret">Secret</span>
+        <span class="title-word skip">Touchez pour commencer</span>
+  </div>
+  
+  <div id="start" style="display: none;">
+    <h1>Little Secret</h1>
     <h2>3 à 15 joueurs</h2>
     <p>👤 Nombre de joueurs :</p>
     <input type="number" id="playerCount" min="3" max="15" value="5"/>
@@ -204,7 +258,7 @@
     </div>
   </div>
 
-  <div id="setup">
+  <div id="setup" style="display: none;">
     <h2>Attribution des mots...</h2>
     <div id="players"></div>
     <p id="info">Clique sur le bouton ci-dessous pour découvrir ton mot.</p>
@@ -213,7 +267,7 @@
     <button id="toggleButton" onclick="toggleRole()">Voir mon mot</button>
   </div>
 
-  <div id="reveal">
+  <div id="reveal" style="display: none;">
     <h2>Phase de révélation</h2>
     <p id="revealbis" style="display:none;">Voici comment les rôles et les mots ont été attribués à chaque joueur :</p>
     <ul id="revealList"></ul>
@@ -604,6 +658,15 @@
         setTimeout(() => btn.classList.remove("clicked"), 150);
       });
     });
+    
+    window.addEventListener("load", () => {
+      const intro = document.getElementById("intro");
+      intro.addEventListener("click", () => {
+      intro.style.display = "none";
+      document.getElementById("start").style.display = "block";
+      });
+    });
+          
   </script>
 
 </body>
