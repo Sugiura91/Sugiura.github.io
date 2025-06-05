@@ -183,7 +183,11 @@
     <h2>Phase de révélation</h2>
     <p id="revealbis" style="display:none;">Voici comment les rôles et les mots ont été attribués à chaque joueur dans cette partie :</p>
     <ul id="revealList"></ul>
-    <button id="replayButton" style="display:none;" onclick="restartGame()">Menu principal</button>
+    <div id="replayButtons" style="display: none; justify-content: center; gap: 1em; margin-top: 1em;">
+      <button onclick="restartGame()">Menu principal</button>
+      <button onclick="replaySamePlayers()">Rejouer</button>
+    </div>
+    <button class="reveal-toggle" onclick="showRevealPhase()">Révéler tous les rôles</button>
   </div>
 
   <script>
@@ -372,18 +376,6 @@
 
     function handleToggleClick() {
       if (!showing) {
-        if (rolesPool.length === 0) {
-          document.getElementById("setup").style.display = "none";
-          document.getElementById("reveal").style.display = "block";
-          document.getElementById("revealList").innerHTML = "<li>✅ Tous les rôles ont été distribués. Cliquez sur le bouton ci-dessous pour révéler les rôles.</li>";
-          document.getElementById("revealList").style.fontWeight = "bold";
-          const revealBtn = document.createElement("button");
-          revealBtn.innerText = "Révéler tous les rôles";
-          revealBtn.onclick = showRevealPhase;
-          document.getElementById("reveal").appendChild(revealBtn);
-          return;
-        }
-
         currentRole = rolesPool.pop();
         const currentName = playerNames[playerNumber - 1];
         revealedRoles.push({ joueur: currentName, role: currentRole });
@@ -439,10 +431,6 @@
         document.getElementById("reveal").style.display = "block";
         document.getElementById("revealList").innerHTML = "<li>✅ Tous les mots ont été attribués. Cliquez sur le bouton ci-dessous pour révéler les rôles.</li>";
         document.getElementById("revealList").style.fontWeight = "bold";
-        const revealBtn = document.createElement("button");
-        revealBtn.innerText = "Révéler tous les rôles";
-        revealBtn.onclick = showRevealPhase;
-        document.getElementById("reveal").appendChild(revealBtn);
       }
     }
 
@@ -459,33 +447,68 @@
         list.innerHTML += `<li>👤 ${entry.joueur}</li>`;
         list.innerHTML += `<h3> ${entry.role} — ${word}</h3>`;
       });
-      const oldRevealBtn = document.querySelector("#reveal button:not(#replayButton)");
-        if (oldRevealBtn) oldRevealBtn.remove();
-      document.getElementById("replayButton").style.display = "inline-block";
+      // Supprimer le bouton "Révéler tous les rôles"
+      const revealBtn = document.querySelector("#reveal button.reveal-toggle");
+      if (revealBtn) revealBtn.remove();
       
+      // Afficher les deux vrais boutons
+      document.getElementById("replayButtons").style.display = "flex";
     }
     
-    function restartGame() {
+    function replaySamePlayers() {
       rolesPool = [];
       revealedRoles = [];
       playerNumber = 1;
+      document.getElementById("info").innerText = `Clique sur le bouton ci-dessous pour découvrir ton mot`;
     
-      // Réutilise les mêmes rôles et noms de joueurs
       shuffleArray(allRoles);
       rolesPool = [...allRoles];
     
-      // Rechoisit un mot correspondant à l'index commun
       const list = wordLists[selectedDifficulty];
       const index = Math.floor(Math.random() * list.disciples.length);
       motSecret = list.disciples[index];
       motPiege = list.infiltrees[index];
     
+      document.getElementById("reveal").style.display = "none";
+      document.getElementById("revealbis").style.display = "none";
+      document.getElementById("replayButtons").style.display = "none";
+      document.getElementById("setup").style.display = "block";
+      document.getElementById("toggleButton").innerText = "Voir mon mot";
+      document.getElementById("players").innerText = "";
+      document.getElementById("word").innerText = "⬛⬛⬛";
+      document.getElementById("timer").innerText = "";
+      insertRevealButton();
+      showing = false;
+    }
+    
+    function restartGame() {
+        rolesPool = [];
+        revealedRoles = [];
+        playerNumber = 1;
+        document.getElementById("info").innerText = `Clique sur le bouton ci-dessous pour découvrir ton mot`;
+        
       // Affiche l'écran principal
       const currentName = playerNames[playerNumber - 1];
       document.getElementById("reveal").style.display = "none";
       document.getElementById("revealbis").style.display = "none";
       document.getElementById("start").style.display = "block";
-      document.getElementById("replayButton").style.display = "none";
+      document.getElementById("replayButtons").style.display = "none";
+      insertRevealButton();
+    }
+    
+    function insertRevealButton() {
+      const reveal = document.getElementById("reveal");
+    
+      // Vérifie qu'il n'existe pas déjà
+      if (!document.querySelector("#reveal button.reveal-toggle")) {
+        const btn = document.createElement("button");
+        btn.className = "reveal-toggle";
+        btn.innerText = "Révéler tous les rôles";
+        btn.onclick = showRevealPhase;
+    
+        // Insère en haut de la div "reveal" (avant les boutons de replay)
+        reveal.insertBefore(btn, document.getElementById("replayButtons"));
+      }
     }
     
     window.onload = function () {
