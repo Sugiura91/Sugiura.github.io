@@ -36,15 +36,15 @@
       }
       
       input[type="text"], textarea {
-              padding: 5px;
-              border-radius: 5px;
-              margin: 5px 0;
-              width: 45%;
-              font-size: 1em;
-              background-color: #111827;
-              color: #F3F4F6;
-              text-align: center;
-            }
+        padding: 5px;
+        border-radius: 5px;
+        margin: 5px 0;
+        width: 45%;
+        font-size: 1em;
+        background-color: #111827;
+        color: #F3F4F6;
+        text-align: center;
+      }
     
       button {
         padding: 10px 20px;
@@ -69,6 +69,28 @@
         min-height: 150px;
       }
       
+      select {
+        background-color: #111827;
+        color: #F3F4F6;
+        border: none;
+        padding: 10px;
+        font-size: 1em;
+        border-radius: 5px;
+        margin: 10px 0;
+        width: 80%;
+        max-width: 400px;
+        box-shadow: 0 0 0 1px #374151 inset;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='20' width='20' viewBox='0 0 20 20'><path d='M7 7l3 3 3-3'/></svg>");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 1em;
+        text-align: center;
+        text-align-last: center;
+      }
+      
     #setup, #reveal {
       display: none;
       max-width: 600px;
@@ -78,7 +100,7 @@
       border-radius: 10px;
       box-shadow: 0 0 10px #00000088;
     }
-    #names, #options {
+    #names, #options, #chooseStarter {
       max-width: 600px;
       margin: auto;
       background-color: #1F2937;
@@ -159,14 +181,26 @@
   </div>
   
   <div id="names" style="display:none;">
-    <h2>Entrez le nom des joueurs</h2>
+    <h2>Inscrire le nom des joueurs</h2>
     <form id="namesForm"></form>
     <div style="text-align: center; margin-bottom: 1em;">
       <button onclick="clearSavedNames()">Effacer les noms enregistrés</button>
     </div>
     <div style="margin-top: 1em; display: flex; justify-content: center; gap: 1em;">
       <button onclick="mainMenu()">Retour</button>
-      <button onclick="submitNames()">Démarrer la partie</button>
+      <button onclick="submitNames()">Suivant</button>
+    </div>
+  </div>
+  
+  <div id="chooseStarter" style="display:none;">
+    <h2>Ordre de passage</h2>
+    <label for="starterSelect">Sélection du premier joueur :</label>
+    <br>
+    <select id="starterSelect"></select>
+    <br><br>
+    <div style="display: flex; justify-content: space-between; gap: 0em;">
+      <button onclick="nameMenu()">Retour</button>
+      <button onclick="startDistribution()">Démarrer la partie</button>
     </div>
   </div>
 
@@ -181,7 +215,7 @@
 
   <div id="reveal">
     <h2>Phase de révélation</h2>
-    <p id="revealbis" style="display:none;">Voici comment les rôles et les mots ont été attribués à chaque joueur dans cette partie :</p>
+    <p id="revealbis" style="display:none;">Voici comment les rôles et les mots ont été attribués à chaque joueur :</p>
     <ul id="revealList"></ul>
     <div id="replayButtons" style="display: none; justify-content: center; gap: 1em; margin-top: 1em;">
       <button onclick="restartGame()">Menu principal</button>
@@ -224,6 +258,7 @@
     let countdown = 0;
     let displaySeconds = 10;
     let playerNumber = 1;
+    let orderedPlayerNames = [];
 
     function getRandomFromArray(array) {
       return array[Math.floor(Math.random() * array.length)];
@@ -295,6 +330,11 @@
       document.getElementById("start").style.display = "block";
     }
     
+    function nameMenu() {
+          document.getElementById("chooseStarter").style.display = "none";
+          document.getElementById("names").style.display = "block";
+        }
+    
     function prepareNames() {
       const totalPlayers = parseInt(document.getElementById("playerCount").value);
       const spyCount = parseInt(document.getElementById("spyCount").value);
@@ -351,12 +391,16 @@
       }
 
       document.getElementById("names").style.display = "none";
-      document.getElementById("setup").style.display = "block";
-      document.getElementById("toggleButton").innerText = "Voir mon mot";
-      document.getElementById("word").innerText = "⬛⬛⬛";
-      document.getElementById("timer").innerText = "";
-      showing = false;
-      playerNumber = 1;
+      document.getElementById("chooseStarter").style.display = "block";
+      
+      const select = document.getElementById("starterSelect");
+      select.innerHTML = "";
+      playerNames.forEach((name, index) => {
+        const option = document.createElement("option");
+        option.value = index;
+        option.text = name;
+        select.appendChild(option);
+      });
     }
     
     function clearSavedNames() {
@@ -364,6 +408,34 @@
     
       const inputs = document.querySelectorAll("#namesForm input");
       inputs.forEach(input => input.value = "");
+    }
+    
+    function startDistribution() {
+      const startIndex = parseInt(document.getElementById("starterSelect").value);
+    
+      // Réorganise la liste des joueurs à partir du joueur choisi
+      orderedPlayerNames = playerNames.slice(startIndex).concat(playerNames.slice(0, startIndex));
+    
+      // Réorganise les rôles dans le même ordre
+      shuffleArray(allRoles);
+      rolesPool = [...allRoles];
+    
+      revealedRoles = [];
+      playerNumber = 1;
+    
+      const list = wordLists[selectedDifficulty];
+      const index = Math.floor(Math.random() * list.disciples.length);
+      motSecret = list.disciples[index];
+      motPiege = list.infiltrees[index];
+    
+      // Affiche l’écran de distribution
+      document.getElementById("chooseStarter").style.display = "none";
+      document.getElementById("setup").style.display = "block";
+      document.getElementById("toggleButton").innerText = "Voir mon mot";
+      document.getElementById("players").innerText = "";
+      document.getElementById("word").innerText = "⬛⬛⬛";
+      document.getElementById("timer").innerText = "";
+      showing = false;
     }
     
     function toggleRole() {
@@ -377,7 +449,7 @@
     function handleToggleClick() {
       if (!showing) {
         currentRole = rolesPool.pop();
-        const currentName = playerNames[playerNumber - 1];
+        const currentName = orderedPlayerNames[playerNumber - 1];
         revealedRoles.push({ joueur: currentName, role: currentRole });
         playerNumber++;
         let wordShown = "";
@@ -419,7 +491,7 @@
 
     function hideRole() {
       clearInterval(timer);
-      const currentName = playerNames[playerNumber - 1];
+      const currentName = orderedPlayerNames[playerNumber - 1];
       document.getElementById("players").innerText = "";
       document.getElementById("word").innerText = "⬛⬛⬛";
       document.getElementById("info").innerText = `Passe l'appareil à ${currentName}`;
@@ -472,11 +544,7 @@
       document.getElementById("reveal").style.display = "none";
       document.getElementById("revealbis").style.display = "none";
       document.getElementById("replayButtons").style.display = "none";
-      document.getElementById("setup").style.display = "block";
-      document.getElementById("toggleButton").innerText = "Voir mon mot";
-      document.getElementById("players").innerText = "";
-      document.getElementById("word").innerText = "⬛⬛⬛";
-      document.getElementById("timer").innerText = "";
+      document.getElementById("chooseStarter").style.display = "block";
       insertRevealButton();
       showing = false;
     }
