@@ -165,7 +165,7 @@
       <button onclick="clearSavedNames()">Effacer les noms enregistrés</button>
     </div>
     <div style="margin-top: 1em; display: flex; justify-content: center; gap: 1em;">
-      <button onclick="mainMenu()">Retour accueil</button>
+      <button onclick="mainMenu()">Retour</button>
       <button onclick="submitNames()">Démarrer la partie</button>
     </div>
   </div>
@@ -183,7 +183,7 @@
     <h2>Phase de révélation</h2>
     <p id="revealbis" style="display:none;">Voici comment les rôles et les mots ont été attribués à chaque joueur dans cette partie :</p>
     <ul id="revealList"></ul>
-    <button id="replayButton" style="display:none;" onclick="restartGame()">Rejouer</button>
+    <button id="replayButton" style="display:none;" onclick="restartGame()">Menu principal</button>
   </div>
 
   <script>
@@ -480,15 +480,11 @@
       motSecret = list.disciples[index];
       motPiege = list.infiltrees[index];
     
-      // Affiche l'écran de distribution
+      // Affiche l'écran principal
       const currentName = playerNames[playerNumber - 1];
       document.getElementById("reveal").style.display = "none";
-      document.getElementById("setup").style.display = "block";
-      document.getElementById("toggleButton").innerText = "Voir mon mot";
-      document.getElementById("word").innerText = "⬛⬛⬛";
-      document.getElementById("info").innerText = `Passe l'appareil à ${currentName}`;
-      document.getElementById("timer").innerText = "";
-      showing = false;
+      document.getElementById("revealbis").style.display = "none";
+      document.getElementById("start").style.display = "block";
       document.getElementById("replayButton").style.display = "none";
     }
     
