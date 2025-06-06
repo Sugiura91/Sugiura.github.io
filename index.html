@@ -9,7 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Little Secret - Mobile</title>
   <link rel="apple-touch-icon" href="icon.png" />
-  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&amp;display=swap" rel="stylesheet">
   <style>
     body {
       background-color: #111827;
@@ -23,6 +23,22 @@
     h1, h2, h3 {
       color: #60A5FA;
       margin-bottom: 0.5em;
+    }
+    
+    
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    
+    li {
+      font-size: 1.4em;
+      margin-top: 15px;
+    }
+    
+    lj {
+      color: #60A5FA;
+      font-size: 1em;
     }
     
     input[type="number"] {
@@ -181,16 +197,7 @@
       font-weight: bold;
       margin-top: 10px;
     }
-    
-    ul {
-      list-style-type: none;
-      padding: 0;
-    }
-    li {
-      font-size: 1.4em;
-      margin: 5px 0;
-    }
-    
+
   </style>
 </head>
 <body>
@@ -205,13 +212,13 @@
     <h1>Little Secret</h1>
     <h2>3 à 15 joueurs</h2>
     <p>👤 Nombre de joueurs :</p>
-    <input type="number" id="playerCount" min="3" max="15" value="5"/>
+    <input type="number" id="playerCount" min="3" max="15" value="5" onchange="updateRoleDistribution()" />
     
     <p>🫣 Nombre d'infiltrés :</p>
-    <input type="number" id="spyCount" min="1" max="10" value="1"/>
+    <input type="number" id="spyCount" value="1" disabled />
     
     <p>🕵️‍♂️ Nombre de journalistes :</p>
-    <input type="number" id="journalistCount" min="0" max="10" value="1"/>
+    <input type="number" id="journalistCount" value="1" disabled />
 
     <p>⏳ Temps d'affichage du rôle :</p>
     <input type="number" id="displayDuration" min="3" max="30" value="10"/>
@@ -391,6 +398,20 @@
           document.getElementById("chooseStarter").style.display = "none";
           document.getElementById("names").style.display = "block";
         }
+        
+    function updateRoleDistribution() {
+      const total = parseInt(document.getElementById("playerCount").value);
+    
+      // Règle simple proposée : 1 journaliste, 1 infiltré pour 4 joueurs
+      const journalists = Math.max(0, Math.floor(total / 5));
+      const spies = Math.max(1, Math.floor(total / 2 - 1.5));
+    
+      const journalistInput = document.getElementById("journalistCount");
+      const spyInput = document.getElementById("spyCount");
+    
+      journalistInput.value = journalists;
+      spyInput.value = spies;
+    }
     
     function prepareNames() {
       const totalPlayers = parseInt(document.getElementById("playerCount").value);
@@ -574,7 +595,7 @@
                    entry.role === "🫣 Infiltré" ? motPiege :
                    "Aucun";
         list.innerHTML += `<li>👤 ${entry.joueur}</li>`;
-        list.innerHTML += `<h3> ${entry.role} — ${word}</h3>`;
+        list.innerHTML += `<lj> ${entry.role} — ${word}</lj>`;
       });
       // Supprimer le bouton "Révéler tous les rôles"
       const revealBtn = document.querySelector("#reveal button.reveal-toggle");
