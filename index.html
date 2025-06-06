@@ -133,6 +133,20 @@
       animation: pulse 2s infinite;
     }
     
+    .screen {
+      opacity: 0;
+      transition: opacity 0.8s ease-in-out;
+      position: absolute;
+      top: 10;
+      left: 10;
+      width: 100%;
+    }
+    
+    .screen.visible {
+      opacity: 1;
+      position: relative;
+    }
+    
     @keyframes pulse {
       0% { opacity: 0.9; }
       50% { opacity: 0.2; }
@@ -181,13 +195,13 @@
 </head>
 <body>
 
-  <div id="intro">
+  <div id="intro" class="screen visible">
     <span class="title-word little">Little</span>
     <span class="title-word secret">Secret</span>
         <span class="title-word skip">Touchez pour commencer</span>
   </div>
   
-  <div id="start" style="display: none;">
+  <div id="start" class="screen" style="display: none;">
     <h1>Little Secret</h1>
     <h2>3 à 15 joueurs</h2>
     <p>👤 Nombre de joueurs :</p>
@@ -366,17 +380,6 @@
       document.getElementById("start").style.display = "block";
       
       localStorage.setItem("selectedDifficulty", selectedDifficulty);
-    }
-    
-    function restoreDefaultWords() {
-      discipleWords = [...defaultDiscipleWords];
-      infiltréWords = [...defaultInfiltréWords];
-    
-      localStorage.removeItem("discipleWords");
-      localStorage.removeItem("infiltréWords");
-    
-      document.getElementById("discipleWordsInput").value = discipleWords.join("\n");
-      document.getElementById("infiltréWordsInput").value = infiltréWords.join("\n");
     }
 
     function mainMenu() {
@@ -650,6 +653,7 @@
       if (savedDifficulty && wordLists[savedDifficulty]) {
         selectedDifficulty = savedDifficulty;
       }
+      
     };
     
     document.querySelectorAll("button").forEach(btn => {
@@ -662,10 +666,25 @@
     window.addEventListener("load", () => {
       const intro = document.getElementById("intro");
       intro.addEventListener("click", () => {
-      intro.style.display = "none";
-      document.getElementById("start").style.display = "block";
+      fadeToStart();
       });
     });
+    
+    function fadeToStart() {
+      const intro = document.getElementById("intro");
+      const start = document.getElementById("start");
+    
+      intro.classList.remove("visible");
+      start.style.display = "block";
+    
+      setTimeout(() => {
+        start.classList.add("visible");
+      }, 800);
+    
+      setTimeout(() => {
+        intro.style.display = "none";
+      }, 800);
+    }
           
   </script>
 
