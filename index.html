@@ -52,7 +52,7 @@
         text-align: center;
       }
       
-      input[type="text"], textarea {
+      input[type="text"], textarea, modalInput {
         padding: 5px;
         border-radius: 5px;
         margin: 5px 0;
@@ -169,7 +169,7 @@
       100% { opacity: 0.9; }
     }
     
-    #setup, #reveal {
+    #setup, #tableRound, #votePhase, #reveal {
       display: none;
       max-width: 600px;
       margin: auto;
@@ -217,13 +217,13 @@
     <p>🫣 Nombre d'infiltrés :</p>
     <input type="number" id="spyCount" value="1" disabled />
     
-    <p>🕵️‍♂️ Nombre de journalistes :</p>
+    <p>🕵️‍♂️ Nombre de journaliste :</p>
     <input type="number" id="journalistCount" value="1" disabled />
 
     <p>⏳ Temps d'affichage du rôle :</p>
     <input type="number" id="displayDuration" min="3" max="30" value="10"/>
     
-    <div style="display: flex; justify-content: space-between; gap: 1em;">
+    <div style="display: flex; justify-content: space-between; margin-top: 45px; gap: 1em;">
       <button onclick="openOptions()">Options</button>
       <button onclick="prepareNames()">Nouvelle partie</button>
     </div>
@@ -287,16 +287,46 @@
     <div id="timer"></div>
     <button id="toggleButton" onclick="toggleRole()">Voir mon mot</button>
   </div>
+  
+  <div id="tableRound" style="display: none;">
+    <h2>Tour de table</h2>
+    <p>Chaque joueur en jeu donne un indice oral sur son mot.</p>
+    <button onclick="goToVoting()">Passer au vote</button>
+  </div>
+  
+  <div id="votePhase" style="display: none;">
+    <h2>Vote</h2>
+    <p>Quel joueur souhaitez-vous éliminer ?</p>
+    <div id="voteList"></div>
+  </div>
 
   <div id="reveal" style="display: none;">
     <h2>Phase de révélation</h2>
     <p id="revealbis" style="display:none;">Voici comment les rôles et les mots ont été attribués à chaque joueur :</p>
     <ul id="revealList"></ul>
-    <div id="replayButtons" style="display: none; justify-content: center; gap: 1em; margin-top: 1em;">
-      <button onclick="restartGame()">Menu principal</button>
-      <button onclick="replaySamePlayers()">Rejouer</button>
+    <div id="replayButtons" style="display: none; justify-content: center; gap: 1em;">
+      <button onclick="showScores()">Tableau des scores</button>
     </div>
     <button class="reveal-toggle" onclick="showRevealPhase()">Révéler tous les rôles</button>
+  </div>
+  
+  <div id="scoreBoard" style="display:none;">
+    <h2>Tableau des scores</h2>
+    <ul id="scoreList"></ul>
+    <div style="margin-top: 1em;">
+      <button onclick="restartGame(true)">Menu principal</button>
+      <button onclick="replaySamePlayers()">Rejouer</button>
+    </div>
+  </div>
+  
+  <div id="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:45%; background-color:rgba(0,0,0,0.8); z-index:10; align-items:center; justify-content:center;">
+    <div id="modalContent" style="background:#1F2937; color:white; padding:20px; border-radius:10px; max-width:90%; text-align:center;">
+      <p id="modalMessage"></p>
+      <input id="modalInput" style="display:none; margin-top:10px; padding:5px; border-radius: 5px; width: 93%; font-size: 1em; background-color: #111827; color: #F3F4F6; text-align: center;" />
+      <div style="margin-top:20px;">
+        <button onclick="closeModal(true)">Suivant</button>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -333,7 +363,12 @@
     let countdown = 0;
     let displaySeconds = 10;
     let playerNumber = 1;
+    let playerNames = [];
     let orderedPlayerNames = [];
+    let currentPlayers = []; // joueurs encore en jeu
+    let eliminatedPlayers = []; // joueurs éliminés
+    let modalCallback = null;
+    let playerScores = {}; // { nom: score }
 
     function getRandomFromArray(array) {
       return array[Math.floor(Math.random() * array.length)];
@@ -402,14 +437,10 @@
     function updateRoleDistribution() {
       const total = parseInt(document.getElementById("playerCount").value);
     
-      // Règle simple proposée : 1 journaliste, 1 infiltré pour 4 joueurs
-      const journalists = Math.max(0, Math.floor(total / 5));
       const spies = Math.max(1, Math.floor(total / 2 - 1.5));
     
-      const journalistInput = document.getElementById("journalistCount");
       const spyInput = document.getElementById("spyCount");
     
-      journalistInput.value = journalists;
       spyInput.value = spies;
     }
     
@@ -420,7 +451,7 @@
       displaySeconds = parseInt(document.getElementById("displayDuration").value);
     
       if (spyCount + journalistCount > totalPlayers) {
-        alert("Le total des infiltrés et journalistes dépasse le nombre de joueurs !");
+        showModal("Le total des infiltrés et journalistes dépasse le nombre de joueurs !", false, () => {});
         return;
       }
     
@@ -453,15 +484,13 @@
       motPiege = list.infiltrees[index];
     }
 
-    let playerNames = [];
-
     function submitNames() {
       const inputs = document.querySelectorAll("#namesForm input");
       playerNames = [];
 
       for (let input of inputs) {
         if (input.value.trim() === "") {
-          alert("Tous les joueurs doivent avoir un nom.");
+          showModal("Tous les joueurs doivent avoir un nom.", false, () => {});
           return;
         }
         playerNames.push(input.value.trim());
@@ -474,6 +503,7 @@
       const select = document.getElementById("starterSelect");
       select.innerHTML = "";
       playerNames.forEach((name, index) => {
+        if (!(name in playerScores)) playerScores[name] = 0;
         const option = document.createElement("option");
         option.value = index;
         option.text = name;
@@ -577,11 +607,127 @@
       document.getElementById("timer").innerText = "";
       showing = false;
       if (rolesPool.length === 0) {
-        document.getElementById("setup").style.display = "none";
-        document.getElementById("reveal").style.display = "block";
-        document.getElementById("revealList").innerHTML = "<li>✅ Tous les mots ont été attribués. Cliquez sur le bouton ci-dessous pour révéler les rôles.</li>";
-        document.getElementById("revealList").style.fontWeight = "bold";
+          document.getElementById("setup").style.display = "none";
+          currentPlayers = [...revealedRoles]; // initialiser la liste des survivants
+          showTableRound();
+        }
+    }
+    
+    function showTableRound() {
+      document.getElementById("votePhase").style.display = "none";
+      document.getElementById("tableRound").style.display = "block";
+    }
+    
+    function goToVoting() {
+      document.getElementById("tableRound").style.display = "none";
+      document.getElementById("votePhase").style.display = "block";
+    
+      const voteList = document.getElementById("voteList");
+      voteList.innerHTML = "";
+    
+      currentPlayers.forEach((p, index) => {
+        const btn = document.createElement("button");
+        btn.textContent = `${p.joueur}`;
+        btn.onclick = () => handleVote(index);
+        voteList.appendChild(btn);
+      });
+    }
+    
+    function handleVote(index) {
+      const eliminated = currentPlayers[index];
+    
+      showModal(`🗳️ ${eliminated.joueur} était ${eliminated.role}`, false, () => {
+        if (eliminated.role === "🕵️‍♂️ Journaliste") {
+          showModal("Quel est le mot des disciples ?", true, (guess) => {
+            if (guess && guess.toLowerCase() === motSecret.toLowerCase()) {
+              eliminated.guessSuccess = true;
+              showModal("🎉 Bonne réponse !<br>Le journaliste a gagné !", false, () => {} );
+              return endVotePhase();
+            } else {
+              currentPlayers.splice(index, 1);
+                    eliminatedPlayers.push(eliminated);
+              showModal("❌ Mauvaise réponse ! ❌  <br>Le journaliste a été découvert !", false, () => {} );
+              return handleVoteSuite();
+            }
+          });
+        } else {
+          currentPlayers.splice(index, 1)[0];
+          eliminatedPlayers.push(eliminated);
+          handleVoteSuite(); // continuer normalement
+        }
+      });
+      
+    }
+    
+    function handleVoteSuite() {
+      // Vérifie conditions de fin
+      const disciples = currentPlayers.filter(p => p.role === "🤓 Disciple");
+      const infiltrés = currentPlayers.filter(p => p.role === "🫣 Infiltré");
+      const journalist = currentPlayers.filter(p => p.role === "🕵️‍♂️ Journaliste");
+    
+      if (journalist.length === 1 && currentPlayers.length <= 2) {
+        showModal("Quel est le mot des disciples ?", true, (guess) => {
+          if (guess && guess.toLowerCase() === motSecret.toLowerCase()) {
+            showModal("🎉 Bonne réponse !<br>Le journaliste a gagné !", false, () => {} );
+            return endVotePhase();
+          } else {
+              if (disciples.length === 0) {
+               showModal("🫣 Les infiltrés ont gagné !", false, () => {});
+               return endVotePhase();
+              } else {
+                  if (infiltrés.length === 0) {
+                   showModal("🤓 Les disciples ont gagné !", false, () => {});
+                   return endVotePhase();
+                  };
+              }
+          }
+        });
+       return;
       }
+      
+      if (disciples.length === 0 && journalist.length === 0) {
+        showModal("🫣 Les infiltrés ont gagné !", false, () => {});
+        return endVotePhase();
+      }
+    
+      if (infiltrés.length === 0 && journalist.length === 0) {
+        showModal("🤓 Les disciples ont gagné !", false, () => {});
+        return endVotePhase();
+      }
+    
+      if (currentPlayers.length <= 2 && infiltrés.length === 1) {
+        showModal("📉 Il reste un infiltré parmi les 2 joueurs restants.<br>🫣 Les infiltrés ont gagné !", false, () => {});
+        return endVotePhase();
+      }
+    
+      // Sinon, nouvelle manche
+      showTableRound();
+    }
+    
+    function endVotePhase() {
+      document.getElementById("votePhase").style.display = "none";
+      document.getElementById("tableRound").style.display = "none";
+      document.getElementById("reveal").style.display = "block";
+      // Détermine le type de victoire
+        const disciplesRestants = currentPlayers.filter(p => p.role === "🤓 Disciple");
+        const infiltrésRestants = currentPlayers.filter(p => p.role === "🫣 Infiltré");
+        const journalisteRestant = currentPlayers.find(p => p.role === "🕵️‍♂️ Journaliste");
+        if (journalisteRestant && journalisteRestant.guessSuccess) {
+          // Journaliste a gagné
+          playerScores[journalisteRestant.joueur] += 3;
+        } else if (infiltrésRestants.length > 0 && !journalisteRestant) {
+          // Infiltrés gagnent
+          infiltrésRestants.forEach(p => {
+            playerScores[p.joueur] += 2;
+          });
+        } else {
+          // Disciples gagnent
+          disciplesRestants.forEach(p => {
+            playerScores[p.joueur] += 1;
+          });
+        }
+      document.getElementById("revealList").innerHTML = "<li>✅ Les votes sont à present terminés.<br><br>Cliquez sur le bouton ci-dessous pour révéler les rôles.</li>";
+      document.getElementById("revealList").style.fontWeight = "bold";
     }
 
     function showRevealPhase() {
@@ -605,6 +751,35 @@
       document.getElementById("replayButtons").style.display = "flex";
     }
     
+    function showScores() {
+      document.getElementById("reveal").style.display = "none";
+      document.getElementById("scoreBoard").style.display = "block";
+    
+      const list = document.getElementById("scoreList");
+      list.innerHTML = "";
+    
+      let winners = [];
+    
+      for (const [nom, score] of Object.entries(playerScores)) {
+        list.innerHTML += `<li><strong>${nom}</strong> : ${score} points</li>`;
+        if (score >= 5) winners.push(nom);
+      }
+    
+      if (winners.length > 0) {
+        const message = winners.length === 1
+          ? `${winners[0]} a gagné la partie ! 🎉`
+          : `🏆 Les gagnants sont : ${winners.join(", ")} !`;
+    
+        // Masquer le bouton "Rejouer" seulement
+          const replayBtn = Array.from(document.querySelectorAll("#scoreBoard button"))
+            .find(btn => btn.textContent.includes("Rejouer"));
+          if (replayBtn) replayBtn.style.display = "none";
+        
+          // Afficher le message sans masquer le scoreBoard
+          showModal(message, false, () => {});
+      }
+    }
+    
     function replaySamePlayers() {
       rolesPool = [];
       revealedRoles = [];
@@ -621,13 +796,14 @@
     
       document.getElementById("reveal").style.display = "none";
       document.getElementById("revealbis").style.display = "none";
+      document.getElementById("scoreBoard").style.display = "none";
       document.getElementById("replayButtons").style.display = "none";
       document.getElementById("chooseStarter").style.display = "block";
       insertRevealButton();
       showing = false;
     }
     
-    function restartGame() {
+    function restartGame(resetScores = false) {
         rolesPool = [];
         revealedRoles = [];
         playerNumber = 1;
@@ -635,10 +811,20 @@
         
       // Affiche l'écran principal
       const currentName = playerNames[playerNumber - 1];
+      document.getElementById("scoreBoard").style.display = "none";
       document.getElementById("reveal").style.display = "none";
-      document.getElementById("revealbis").style.display = "none";
+      document.getElementById("setup").style.display = "none";
+      document.getElementById("names").style.display = "none";
+      document.getElementById("options").style.display = "none";
       document.getElementById("start").style.display = "block";
+      document.getElementById("revealList").innerHTML = "";
       document.getElementById("replayButtons").style.display = "none";
+      document.getElementById("revealbis").style.display = "none";
+      
+      if (resetScores) {
+          playerScores = {};
+        }
+      
       insertRevealButton();
     }
     
@@ -705,6 +891,31 @@
       setTimeout(() => {
         intro.style.display = "none";
       }, 800);
+    }
+    
+    function showModal(message, withInput = false, callback = null) {
+      document.getElementById("modalMessage").innerHTML = message;
+      const input = document.getElementById("modalInput");
+      input.style.display = withInput ? "block" : "none";
+      input.value = "";
+      modalCallback = callback;
+      document.getElementById("modal").style.display = "flex";
+    }
+    
+    function closeModal(ok) {
+      const input = document.getElementById("modalInput");
+      const withInput = input.style.display !== "none";
+      document.getElementById("modal").style.display = "none";
+    
+      if (modalCallback) {
+        if (ok) {
+          modalCallback(withInput ? input.value.trim() : true);
+          modalCallback(value);
+        } else {
+          modalCallback(null);
+        }
+      }
+      modalCallback = null;
     }
           
   </script>
