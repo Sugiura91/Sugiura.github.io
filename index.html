@@ -1,6 +1,25 @@
 
 <!DOCTYPE html>
 <html lang="fr">
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBZTt7Vg7dlwm3C4qTANfEV84vqyzP9YlI",
+    authDomain: "little-secret-9e9d8.firebaseapp.com",
+    databaseURL: "https://little-secret-9e9d8-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "little-secret-9e9d8",
+    storageBucket: "little-secret-9e9d8.firebasestorage.app",
+    messagingSenderId: "37063824006",
+    appId: "1:37063824006:web:ff73515196c5b2c0a1b707"
+  };
+
+  // Initialise Firebase
+  const app = firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+</script>
+
 <head>
   <link rel="manifest" href="manifest.json" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -10,6 +29,7 @@
   <title>Little Secret - Mobile</title>
   <link rel="apple-touch-icon" href="icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&amp;display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js"></script>
   <style>
     body {
       background-color: #111827;
@@ -208,9 +228,18 @@
         <span class="title-word skip">Touchez pour commencer</span>
   </div>
   
-  <div id="start" class="screen" style="display: none;">
+  <div id="modeSelect" class="screen" style="display: none;">
     <h1>Little Secret</h1>
-    <h2>3 à 15 joueurs</h2>
+    <h2>Choisir un mode de jeu</h2>
+    <button onclick="startSingleDevice()">Local</button>
+    <button onclick="showMultiplayerOptions()">Multiscreen</button>
+    <br>
+    <button onclick="openOptions()">Options</button>
+  </div>
+  
+  <div id="start" style="display: none;">
+    <h1>Little Secret</h1>
+    <h2>Mode local - 3 à 15 joueurs</h2>
     <p>👤 Nombre de joueurs :</p>
     <input type="number" id="playerCount" min="3" max="15" value="5" onchange="updateRoleDistribution()" />
     
@@ -224,7 +253,7 @@
     <input type="number" id="displayDuration" min="3" max="30" value="10"/>
     
     <div style="display: flex; justify-content: space-between; margin-top: 45px; gap: 1em;">
-      <button onclick="openOptions()">Options</button>
+      <button onclick="backToModeSelect()">← Retour</button>
       <button onclick="prepareNames()">Nouvelle partie</button>
     </div>
   </div>
@@ -351,6 +380,9 @@
     
     let selectedDifficulty = "facile";
     const journalisteMessage = "❌ Aucun mot ❌ ";
+    
+    const myId = localStorage.getItem("littleSecretUid") || crypto.randomUUID();
+    localStorage.setItem("littleSecretUid", myId);
 
     let rolesPool = [];
     let motSecret = "";
@@ -369,6 +401,22 @@
     let eliminatedPlayers = []; // joueurs éliminés
     let modalCallback = null;
     let playerScores = {}; // { nom: score }
+    
+    function startSingleDevice() {
+      document.getElementById("modeSelect").style.display = "none";
+      document.getElementById("start").style.display = "block";
+    }
+    
+    function showMultiplayerOptions() {
+      document.getElementById("modeSelect").style.display = "none";
+      document.getElementById("multiOptions").style.display = "block";
+    }
+    
+    function backToModeSelect() {
+      document.getElementById("start").style.display = "none";
+      document.getElementById("multiOptions").style.display = "none";
+      document.getElementById("modeSelect").style.display = "block";
+    }
 
     function getRandomFromArray(array) {
       return array[Math.floor(Math.random() * array.length)];
@@ -382,7 +430,7 @@
     }
 
     function openOptions() {
-      document.getElementById("start").style.display = "none";
+      document.getElementById("modeSelect").style.display = "none";
       document.getElementById("options").style.display = "block";
     
       document.getElementById("difficultySelect").value = selectedDifficulty;
@@ -419,7 +467,7 @@
       }
     
       document.getElementById("options").style.display = "none";
-      document.getElementById("start").style.display = "block";
+      document.getElementById("modeSelect").style.display = "block";
       
       localStorage.setItem("selectedDifficulty", selectedDifficulty);
     }
@@ -844,6 +892,17 @@
     }
     
     window.onload = function () {
+      const urlCode = new URLSearchParams(location.search).get("lobby");
+      if (urlCode) {
+        joinLobbyViaUrl(urlCode);
+      }
+      
+      function joinLobbyViaUrl(code) {
+        document.getElementById("modeSelect").style.display = "none";
+        document.getElementById("joinInput").style.display = "block";
+        document.getElementById("lobbyCodeInput").value = code;
+      }
+      
       const savedCustomD = localStorage.getItem("customDisciples");
       const savedCustomI = localStorage.getItem("customInfiltrees");
       
@@ -879,7 +938,7 @@
     
     function fadeToStart() {
       const intro = document.getElementById("intro");
-      const start = document.getElementById("start");
+      const start = document.getElementById("modeSelect");
     
       intro.classList.remove("visible");
       start.style.display = "block";
@@ -917,8 +976,150 @@
       }
       modalCallback = null;
     }
+    
+    function lobbyRef(code)  { return db.ref("lobbies/" + code); }
+    function playersRef(code){ return db.ref("lobbies/" + code + "/players"); }
+    function makeLobbyCode() { return Math.random().toString(36).substring(2,7).toUpperCase(); }
+    
+    function createLobby() {
+      showModal("Entrez votre nom :", true, (hostName) => {
+        if (!hostName) return;
+      
+        const code = makeLobbyCode();
+        lobbyRef(code).set({
+          hostId: myId,
+          gameStarted: false
+        });
+      
+        playersRef(code).child(myId).set({ name: hostName });
+      
+        document.getElementById("multiOptions").style.display = "none";
+        document.getElementById("hostLobby").style.display = "block";
+        document.getElementById("lobbyCodeHost").innerText = code;
+      
+        const url = location.origin + location.pathname + "?lobby=" + code;
+        QRCode.toCanvas(document.getElementById("qrCanvas"), url);
+      
+        playersRef(code).on("value", snap => {
+          const ul = document.getElementById("hostPlayerList");
+          ul.innerHTML = "";
+          snap.forEach(c => { ul.innerHTML += `<li></li>`; });
+        });
+      
+        sessionStorage.setItem("currentLobby", code);
+        sessionStorage.setItem("isHost", "true");
+      });
+    }
+    
+    function joinLobby() {
+      document.getElementById("multiOptions").style.display = "none";
+      document.getElementById("joinInput").style.display = "block";
+    }
+    
+    function backFromJoin() {
+      document.getElementById("joinInput").style.display = "none";
+      document.getElementById("multiOptions").style.display = "block";
+    }
+    
+    function confirmJoinLobby() {
+      const code = document.getElementById("lobbyCodeInput").value.trim().toUpperCase();
+      const name = document.getElementById("guestNameInput").value.trim();
+      if (!code || !name) { alert("Code ou nom manquant"); return; }
+    
+      playersRef(code).child(myId).set({ name });
+    
+      // Affiche l’écran invité
+      document.getElementById("joinInput").style.display = "none";
+      document.getElementById("guestLobby").style.display = "block";
+      document.getElementById("lobbyCodeGuest").innerText = code;
+    
+      playersRef(code).on("value", snap => {
+        const ul = document.getElementById("guestPlayerList");
+        ul.innerHTML = "";
+        snap.forEach(c => { ul.innerHTML += `<li>${c.val().name}</li>`; });
+      });
+    
+      // écoute le démarrage
+      lobbyRef(code).child("gameStarted").on("value", s => {
+        if (s.val()) startRemoteGame();
+      });
+    
+      sessionStorage.setItem("currentLobby", code);
+      sessionStorage.setItem("isHost", "false");
+    }
+    
+    function startRemoteGame() {
+      const code = sessionStorage.getItem("currentLobby");
+      if (!code) return;
+    
+      if (sessionStorage.getItem("isHost")==="true") {
+        lobbyRef(code).child("gameStarted").set(true);
+      }
+    
+      // TODO : ici tu peux appeler startDistribution()
+      // en mode multijoueur : chaque client récupère la même seed,
+      // ou bien l’hôte distribue les rôles et les pousse dans /lobbies/{code}/roles
+      alert(">>> Commencer la partie (à toi de décider la suite)");
+    }
+    
+    function leaveLobby() {
+      const code = sessionStorage.getItem("currentLobby");
+      playersRef(code).child(myId).remove();
+      resetToModeSelect();
+    }
+    
+    function closeLobby() {               // appelé par l’hôte
+      const code = sessionStorage.getItem("currentLobby");
+      lobbyRef(code).remove();
+      resetToModeSelect();
+    }
+    
+    function resetToModeSelect() {
+      ["hostLobby","guestLobby"].forEach(id=>document.getElementById(id).style.display="none");
+      document.getElementById("modeSelect").style.display="block";
+      sessionStorage.removeItem("currentLobby");
+    }
           
   </script>
+
+  
+  <div id="multiOptions" style="display: none;">
+      <h1>Little Secret</h1>
+      <h2>Mode multi - 3 à 15 joueurs</h2>
+    <button onclick="createLobby()">Créer un lobby</button>
+    <button onclick="joinLobby()">Rejoindre un lobby</button>
+    <br>
+    <button onclick="backToModeSelect()">← Retour</button>
+  </div>
+  
+  <!-- Écran « hostLobby » : l’hôte voit le QR et la liste -->
+  <div id="hostLobby" style="display:none;">
+    <h2>Lobby <span id="lobbyCodeHost"></span></h2>
+    <canvas id="qrCanvas"></canvas>
+    <h3>Joueurs connectés</h3>
+    <ul id="hostPlayerList"></ul>
+    <button onclick="startRemoteGame()">Démarrer la partie</button>
+    <button onclick="closeLobby()">Annuler</button>
+  </div>
+  
+  <!-- Écran « guestLobby » : les invités attendent l’hôte -->
+  <div id="guestLobby" style="display:none;">
+    <h2>Lobby <span id="lobbyCodeGuest"></span></h2>
+    <p>En attente du lancement…</p>
+    <h3>Joueurs connectés</h3>
+    <ul id="guestPlayerList"></ul>
+    <button onclick="leaveLobby()">Quitter</button>
+  </div>
+  
+  <!-- Petit input pour rejoindre en scannant OU code manuel -->
+  <div id="joinInput" style="display:none;">
+    <h2>Rejoindre un lobby</h2>
+    <input id="lobbyCodeInput" placeholder="Code lobby" style="width:150px">
+    <input id="guestNameInput" placeholder="Votre nom" style="width:150px">
+    <br><br>
+    <button onclick="confirmJoinLobby()">Rejoindre</button>
+    <button onclick="backFromJoin()">← Retour</button>
+  </div>
 
 </body>
 </html>
