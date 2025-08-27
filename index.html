@@ -935,7 +935,7 @@
           showModal("Quel est le mot des disciples ?", true, (guess) => {
             if (guess && guess.toLowerCase() === motSecret.toLowerCase()) {
               eliminated.guessSuccess = true;
-              showModal("🎉 Bonne réponse !<br>Le journaliste a gagné !", false, () => {});
+              showModal("🎉 Bonne réponse !<br><br>Victoire du journaliste !", false, () => {});
               return endVotePhase();
             } else {
               // ❌ Mauvaise réponse → on élimine le journaliste
@@ -949,7 +949,7 @@
                 firstPlayerIndex = null;
               }
     
-              showModal("❌ Mauvaise réponse ! ❌ <br>Le journaliste a été découvert !", false, () => {});
+              showModal("❌ Mauvaise réponse ! ❌ <br><br>Le journaliste a été découvert !", false, () => {});
               return handleVoteSuite();
             }
           });
@@ -973,78 +973,107 @@
     function handleVoteSuite() {
       const disciples = currentPlayers.filter(p => p.role === "🤓 Disciple");
       const infiltrés = currentPlayers.filter(p => p.role === "🫣 Infiltré");
-      const journalist = currentPlayers.find(p => p.role === "🕵️‍♂️ Journaliste");
+      const journalistes = currentPlayers.filter(p => p.role === "🕵️‍♂️ Journaliste");
     
-      if (journalist && currentPlayers.length <= 2) {
-        showModal(
-          "📉 Il reste un journaliste parmi les 2 joueurs restants.<br>Il doit deviner le mot des disciples pour gagner !<br><br>Quel est le mot des disciples ?",
-          true,
-          (guess) => {
+      // Cas 1 : Plus que 2 joueurs et seulement 1 disciple
+      if (currentPlayers.length === 2 && disciples.length === 1) {
+        const autre = currentPlayers.find(p => p.role !== "🤓 Disciple");
+    
+        if (autre.role === "🫣 Infiltré") {
+          // ➡️ infiltré gagne
+          showModal("📉 Il reste encore 1 infiltré parmi les 2 joueurs restants.<br><br> Victoire de l'infiltré !", false, endVotePhase("infiltrés"));
+          return;
+        }
+    
+        if (autre.role === "🕵️‍♂️ Journaliste") {
+          // ➡️ journaliste doit deviner
+          showModal("📉 Il reste encore 1 journaliste parmi les 2 joueurs restants.<br><br>Le journaliste doit deviner le mot des disciples pour gagner !", true, (guess) => {
             if (guess && guess.toLowerCase() === motSecret.toLowerCase()) {
-              journalist.guessSuccess = true;
-              showModal("🎉 Bonne réponse !<br>Le journaliste a gagné !", false, endVotePhase);
+              autre.guessSuccess = true;
+              showModal("🎉 Bonne réponse !<br><br>Victoire du journaliste !", false, endVotePhase("journalistes"));
             } else {
-              if (disciples.length === 0) {
-                showModal("🫣 Les infiltrés ont gagné !", false, endVotePhase);
-              } else if (infiltrés.length === 0) {
-                showModal("🤓 Les disciples ont gagné !", false, endVotePhase);
-              } else {
-                // Cas de guess incorrect mais la partie n’est pas terminée : nouvelle manche
-                showTableRound();
-              }
+              showModal("❌ Mauvaise réponse !<br><br>Victoire du disciple !", false, endVotePhase("disciples"));
             }
-          }
-        );
+          });
+          return;
+        }
+      }
+    
+      // Cas 2 : Tous les infiltrés éliminés ET tous les journalistes éliminés → disciples gagnent
+      if (infiltrés.length === 0 && journalistes.length === 0) {
+        showModal("Tous les journalistes et infiltrés sont éliminés !<br><br>Victoire des disciples !", false, endVotePhase);
         return;
       }
     
-      if (disciples.length === 0 && !journalist) {
-        showModal("🫣 Les infiltrés ont gagné !", false, endVotePhase);
+      // Cas 3 : Tous les disciples éliminés → infiltrés gagnent
+      if (disciples.length === 0 && infiltrés.length > 0) {
+        showModal("Tous les disciples sont éliminés !<br><br>Victoire des infiltrés !", false, endVotePhase);
         return;
       }
     
-      if (infiltrés.length === 0 && !journalist) {
-        showModal("🤓 Les disciples ont gagné !", false, endVotePhase);
+      // Cas 4 : Plus d’infiltrés ET plus de disciples → seuls journalistes restants
+      if (infiltrés.length === 0 && disciples.length === 0 && journalistes.length > 0) {
+        showModal("Tous les infiltrés et disciples sont éliminés !<br><br>Victoire des journalistes !", false, endVotePhase);
         return;
       }
     
-      if (currentPlayers.length <= 2 && infiltrés.length === 1) {
-        showModal("📉 Il reste un infiltré parmi les 2 joueurs restants.<br>🫣 Les infiltrés ont gagné !", false, endVotePhase);
-        return;
-      }
-    
-      // Sinon, nouvelle manche
+      // Sinon : nouvelle manche
       showTableRound();
     }
     
-    function endVotePhase() {
-            document.getElementById("votePhase").style.display = "none";
-            document.getElementById("tableRound").style.display = "none";
-            document.getElementById("reveal").style.display = "block";
-          
-            const disciplesRestants = currentPlayers.filter(p => p.role === "🤓 Disciple");
-            const infiltrésRestants = currentPlayers.filter(p => p.role === "🫣 Infiltré");
-            const journalisteRestant = currentPlayers.find(p => p.role === "🕵️‍♂️ Journaliste");
-          
-            // 🔄 Reset des scores de la manche
-            roundScores = {};
-          
-            if (journalisteRestant && journalisteRestant.guessSuccess) {
-              playerScores[journalisteRestant.joueur] += 3;
-              roundScores[journalisteRestant.joueur] = 3;
-            } else if (infiltrésRestants.length > 0) {
-              infiltrésRestants.forEach(p => {
-                playerScores[p.joueur] += 2;
-                roundScores[p.joueur] = 2;
-              });
-            } else {
-              disciplesRestants.forEach(p => {
-                playerScores[p.joueur] += 1;
-                roundScores[p.joueur] = 1;
-              });
-            }
-
-      document.getElementById("revealList").innerHTML = "<li>✅ Les votes sont à present terminés.<br><br>Cliquez sur le bouton ci-dessous pour révéler les rôles.</li>";
+    function endVotePhase(forcedWinner = null) {
+      document.getElementById("votePhase").style.display = "none";
+      document.getElementById("tableRound").style.display = "none";
+      document.getElementById("reveal").style.display = "block";
+    
+      const disciplesRestants = currentPlayers.filter(p => p.role === "🤓 Disciple");
+      const infiltrésRestants = currentPlayers.filter(p => p.role === "🫣 Infiltré");
+      const journalistesRestants = currentPlayers.filter(p => p.role === "🕵️‍♂️ Journaliste");
+      const journalisteGagnant = currentPlayers.find(p => p.guessSuccess);
+    
+      roundScores = {};
+    
+      // ✅ Cas spécial (transmis depuis handleVoteSuite)
+      if (forcedWinner === "infiltrés") {
+        infiltrésRestants.forEach(p => {
+          playerScores[p.joueur] += 2;
+          roundScores[p.joueur] = 2;
+        });
+      } else if (forcedWinner === "disciples") {
+        disciplesRestants.forEach(p => {
+          playerScores[p.joueur] += 1;
+          roundScores[p.joueur] = 1;
+        });
+      } else if (forcedWinner === "journalistes") {
+        journalistesRestants.forEach(p => {
+          playerScores[p.joueur] += 3;
+          roundScores[p.joueur] = 3;
+        });
+      }
+    
+      // ✅ Cas général (quand pas de forcedWinner)
+      else if (journalisteGagnant) {
+        playerScores[journalisteGagnant.joueur] += 3;
+        roundScores[journalisteGagnant.joueur] = 3;
+      } else if (infiltrésRestants.length > 0 && disciplesRestants.length === 0) {
+        infiltrésRestants.forEach(p => {
+          playerScores[p.joueur] += 2;
+          roundScores[p.joueur] = 2;
+        });
+      } else if (disciplesRestants.length > 0 && infiltrésRestants.length === 0 && journalistesRestants.length === 0) {
+        disciplesRestants.forEach(p => {
+          playerScores[p.joueur] += 1;
+          roundScores[p.joueur] = 1;
+        });
+      } else if (infiltrésRestants.length === 0 && disciplesRestants.length === 0 && journalistesRestants.length > 0) {
+        journalistesRestants.forEach(p => {
+          playerScores[p.joueur] += 3;
+          roundScores[p.joueur] = 3;
+        });
+      }
+    
+      document.getElementById("revealList").innerHTML =
+        "<li>✅ Les votes sont à présent terminés.<br><br>Cliquez sur le bouton ci-dessous pour révéler les rôles.</li>";
       document.getElementById("revealList").style.fontWeight = "bold";
     }
 
@@ -1144,6 +1173,7 @@
       rolesPool = [];
       revealedRoles = [];
       playerNumber = 1;
+      firstPlayerIndex = null;
       document.getElementById("info").innerText = `Clique sur le bouton ci-dessous pour découvrir ton mot`;
     
       shuffleArray(allRoles);
@@ -1168,6 +1198,7 @@
         rolesPool = [];
         revealedRoles = [];
         playerNumber = 1;
+        firstPlayerIndex = null;
         document.getElementById("info").innerText = `Clique sur le bouton ci-dessous pour découvrir ton mot`;
         
       // Affiche l'écran principal
