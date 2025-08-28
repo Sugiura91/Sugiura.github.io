@@ -295,9 +295,9 @@
       top: 0;
       left: 0;
       height: 100%;
-      border-radius: 12px;
+      border-radius: 12px 0 0 12px; /* ✅ arrondi uniquement à gauche */
       background-color: #39A853;
-      transition: width 600ms ease;
+      transition: width 1600ms ease;
       z-index: 1;
     }
     
@@ -936,6 +936,7 @@
             if (guess && guess.toLowerCase() === motSecret.toLowerCase()) {
               eliminated.guessSuccess = true;
               showModal("🎉 Bonne réponse !<br><br>Victoire du journaliste !", false, () => {});
+              playSound("sounds/journalist_win.mp3");
               return endVotePhase();
             } else {
               // ❌ Mauvaise réponse → on élimine le journaliste
@@ -1126,38 +1127,44 @@
       let winners = [];
       const pointsToWin = parseInt(document.getElementById("pointsToWin").value, 10);
     
-      for (const [nom, score] of sortedPlayers) {
+      sortedPlayers.forEach(([nom, score], i) => {
         const gain = roundScores && roundScores[nom] ? `(+${roundScores[nom]})` : "";
-    
-        // largeur en pourcentage relative au joueur le plus haut
         const widthPercent = Math.round((score / maxScore) * 100);
+        // si on arrive à 100%, pousser un peu plus loin
+        const finalWidth = widthPercent >= 100 ? 100.5 + "%" : widthPercent + "%";
     
-        list.innerHTML += `
-          <sc class="score-row">
-            <div class="score-wrapper">
-              <div class="score-bar-container">
-                <div class="score-bar" style="width: ${widthPercent}%;"></div>
-                <div class="score-content">
-                  <span class="score-left">${escapeHtml(nom)}</span>
-                  <span class="score-right">${score} pts</span>
-                </div>
+        // ✅ largeur initiale à 0%
+        const row = document.createElement("sc");
+        row.classList.add("score-row");
+        row.innerHTML = `
+          <div class="score-wrapper">
+            <div class="score-bar-container">
+              <div class="score-bar" style="width: 0%;"></div>
+              <div class="score-content">
+                <span class="score-left">${escapeHtml(nom)}</span>
+                <span class="score-right">${score} pts</span>
               </div>
-              ${gain ? `<span class="score-gain">${gain}</span>` : `(+0)`}
             </div>
-          </sc>
+            ${gain ? `<span class="score-gain">${gain}</span>` : `(+0)`}
+          </div>
         `;
+        list.appendChild(row);
     
+        // ✅ appliquer la vraie largeur après un petit délai → animation
+        setTimeout(() => {
+          const bar = row.querySelector(".score-bar");
+          bar.style.width = finalWidth;
+        }, 100 * i); // petit décalage entre joueurs (effet cascade)
+        
         if (score >= pointsToWin) winners.push(nom);
-      }
+      });
     
       if (winners.length > 0) {
         const message = winners.length === 1
           ? `${winners[0]} a gagné la partie ! 🎉`
           : `🏆 Les gagnants sont : ${winners.join(", ")} !`;
     
-        // Masquer le bouton "Rejouer" seulement
         if (replayBtn) replayBtn.style.display = "none";
-    
         showModal(message, false, () => {});
       }
     }
@@ -1324,6 +1331,17 @@
         }
       }
       modalCallback = null;
+    }
+    
+    let currentAudio = null;
+    function playSound(path) {
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+      }
+      currentAudio = new Audio(path);
+      currentAudio.volume = 0.7;
+      currentAudio.play();
     }
           
   </script>
