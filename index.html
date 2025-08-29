@@ -576,22 +576,12 @@
     let firstPlayerIndex = null;
     let roundScores = {};
     let currentAudio = null;
-    // 🎶 Musique d'intro (globale)
-    let introMusic = new Audio("sounds/Intro.mp3");
-    introMusic.loop = true;   // boucle infinie
-    introMusic.volume = 0.3;  // volume réglable
-    
-    function playIntroMusic() {
-      introMusic.currentTime = 0; // repart du début
-      introMusic.play().catch(e => {
-        console.log("Lecture audio bloquée par le navigateur :", e);
-      });
-    }
-    
-    function stopIntroMusic() {
-      introMusic.pause();
-      introMusic.currentTime = 0; // reset
-    }
+    const introMusic = new Audio("sounds/Intro.mp3");
+    introMusic.loop = true;
+    introMusic.volume = 0.5;
+    const gameMusic = new Audio("sounds/game.mp3");
+    gameMusic.loop = true;
+    gameMusic.volume = 0.5;
 
     function getRandomFromArray(array) {
       return array[Math.floor(Math.random() * array.length)];
@@ -794,7 +784,15 @@
     }
     
     function startDistribution() {
-      stopIntroMusic(); // 🛑 coupe la musique ici
+      // Stopper l’intro
+        introMusic.pause();
+        introMusic.currentTime = 0;
+      
+        // Lancer la musique de partie
+        gameMusic.currentTime = 0;
+        gameMusic.play().catch(err => console.log("Game bloquée :", err));
+      }
+      
       const startIndex = parseInt(document.getElementById("starterSelect").value, 10);
     
       // Ordre des joueurs à partir du starter choisi
@@ -1235,7 +1233,14 @@
         revealedRoles = [];
         playerNumber = 1;
         firstPlayerIndex = null;
-        playIntroMusic(); // 🎶 relance la musique
+        // Stopper la musique de jeu
+          gameMusic.pause();
+          gameMusic.currentTime = 0;
+        
+          // Relancer la musique intro
+          introMusic.currentTime = 0;
+          introMusic.play().catch(err => console.log("Intro bloquée :", err));
+        }
         
         document.getElementById("info").innerText = `Clique sur le bouton ci-dessous pour découvrir ton mot`;
         
