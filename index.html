@@ -790,8 +790,7 @@
       
         // Lancer la musique de partie
         gameMusic.currentTime = 0;
-        gameMusic.play().catch(err => console.log("Game bloquée :", err));
-      }
+        gameMusic.play()
       
       const startIndex = parseInt(document.getElementById("starterSelect").value, 10);
     
@@ -1239,8 +1238,7 @@
         
           // Relancer la musique intro
           introMusic.currentTime = 0;
-          introMusic.play().catch(err => console.log("Intro bloquée :", err));
-        }
+          introMusic.play()
         
         document.getElementById("info").innerText = `Clique sur le bouton ci-dessous pour découvrir ton mot`;
         
@@ -1329,7 +1327,7 @@
     });
     
     function fadeToStart() {
-      playIntroMusic();
+      introMusic.play();
       const intro = document.getElementById("intro");
       const start = document.getElementById("start");
     
