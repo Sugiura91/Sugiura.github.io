@@ -104,7 +104,7 @@
       input[type=range]::-moz-range-thumb:hover {
         transform: scale(1.2);
       }
-    
+
       button {
         padding: 10px 20px;
         margin: 10px;
@@ -575,6 +575,7 @@
     let playerScores = {}; // { nom: score }
     let firstPlayerIndex = null;
     let roundScores = {};
+    let currentAudio = null;
 
     function getRandomFromArray(array) {
       return array[Math.floor(Math.random() * array.length)];
@@ -951,6 +952,7 @@
               }
     
               showModal("❌ Mauvaise réponse ! ❌ <br><br>Le journaliste a été découvert !", false, () => {});
+              playSound("sounds/fail.mp3");
               return handleVoteSuite();
             }
           });
@@ -1333,7 +1335,6 @@
       modalCallback = null;
     }
     
-    let currentAudio = null;
     function playSound(path) {
       if (currentAudio) {
         currentAudio.pause();
