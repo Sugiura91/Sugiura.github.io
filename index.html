@@ -576,6 +576,22 @@
     let firstPlayerIndex = null;
     let roundScores = {};
     let currentAudio = null;
+    // 🎶 Musique d'intro (globale)
+    let introMusic = new Audio("sounds/Intro.mp3");
+    introMusic.loop = true;   // boucle infinie
+    introMusic.volume = 0.5;  // volume réglable
+    
+    function playIntroMusic() {
+      introMusic.currentTime = 0; // repart du début
+      introMusic.play().catch(e => {
+        console.log("Lecture audio bloquée par le navigateur :", e);
+      });
+    }
+    
+    function stopIntroMusic() {
+      introMusic.pause();
+      introMusic.currentTime = 0; // reset
+    }
 
     function getRandomFromArray(array) {
       return array[Math.floor(Math.random() * array.length)];
@@ -955,7 +971,7 @@
                 // ⏳ attendre un court instant avant de relancer handleVoteSuite
                   setTimeout(() => {
                     handleVoteSuite();
-                  }, 500); // 0.5s = laisse le son démarrer et le modal s'afficher
+                  }, 100); // 0.1s = laisse le son démarrer et le modal s'afficher
               });
             }
           });
@@ -1298,6 +1314,7 @@
     });
     
     window.addEventListener("load", () => {
+      playIntroMusic();
       const intro = document.getElementById("intro");
       intro.addEventListener("click", () => {
       fadeToStart();
