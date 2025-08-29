@@ -941,19 +941,20 @@
               return endVotePhase();
             } else {
               // ❌ Mauvaise réponse → on élimine le journaliste
-              currentPlayers.splice(index, 1);
-              eliminatedPlayers.push(eliminated);
-    
-              // Définir qui commence au prochain tour
-              if (currentPlayers.length > 0) {
-                firstPlayerIndex = index % currentPlayers.length;
-              } else {
-                firstPlayerIndex = null;
-              }
-    
-              showModal("❌ Mauvaise réponse ! ❌ <br><br>Le journaliste a été découvert !", false, () => {});
-              playSound("sounds/fail.mp3");
-              return handleVoteSuite();
+              showModal("❌ Mauvaise réponse ! ❌ <br><br>Le journaliste a été découvert !", false, () => {
+                playSound("sounds/fail.mp3");
+              
+                currentPlayers.splice(index, 1);
+                eliminatedPlayers.push(eliminated);
+              
+                // Définir qui commence au prochain tour
+                if (currentPlayers.length > 0) {
+                  firstPlayerIndex = index % currentPlayers.length;
+                } else {
+                  firstPlayerIndex = null;
+                }
+                return handleVoteSuite();
+              });
             }
           });
         } else {
