@@ -941,9 +941,8 @@
               return endVotePhase();
             } else {
               // ❌ Mauvaise réponse → on élimine le journaliste
+              playSound("sounds/fail.mp3");
               showModal("❌ Mauvaise réponse ! ❌ <br><br>Le journaliste a été découvert !", false, () => {
-                playSound("sounds/fail.mp3");
-              
                 currentPlayers.splice(index, 1);
                 eliminatedPlayers.push(eliminated);
               
