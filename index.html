@@ -11,354 +11,309 @@
   <link rel="apple-touch-icon" href="icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&amp;display=swap" rel="stylesheet">
   <style>
-    body {
-      background-color: #111827;
-      color: #F3F4F6;
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 20px;
-      text-align: center;
-    }
-    
-    h1, h2, h3 {
-      color: #60A5FA;
-      margin-bottom: 0.5em;
-    }
-    
-    
-    ul {
-      list-style-type: none;
-      padding: 0;
-    }
-    
-    li {
-      font-size: 1em;
-      margin-top: 15px;
-    }
-    
-    lj {
-      color: #60A5FA;
-    }
-    
-    sc {
-      color: #111827;
-    }
-    
-    input[type="number"] {
-        padding: 10px;
-        border-radius: 5px;
-        margin: 5px 0;
-        width: 45%;
-        font-size: 1em;
-        background-color: #1F2937;
-        color: #F3F4F6;
-        text-align: center;
-      }
-      
-      input[type="text"], textarea, modalInput {
-        padding: 5px;
-        border-radius: 5px;
-        margin: 5px 0;
-        width: 45%;
-        font-size: 1em;
-        background-color: #111827;
-        color: #F3F4F6;
-        text-align: center;
-      }
-      
-      input[type=range] {
-        -webkit-appearance: none;
-        width: 80%;
-        height: 8px;
-        margin-bottom: 20px;
-        border-radius: 5px;
-        background: #E5E7EB;
-        outline: none;
-        transition: background 0.3s;
-      }
-      
-      input[type=range]::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: #60A5FA;
-        cursor: pointer;
-        transition: transform 0.2s;
-      }
-      
-      input[type=range]::-webkit-slider-thumb:hover {
-        transform: scale(1.2);
-      }
-      
-      input[type=range]::-moz-range-thumb {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: #60A5FA;
-        cursor: pointer;
-        transition: transform 0.2s;
-      }
-      
-      input[type=range]::-moz-range-thumb:hover {
-        transform: scale(1.2);
-      }
-
-      button {
-        padding: 10px 20px;
-        margin: 10px;
-        border-radius: 5px;
-        border: none;
-        background-color: #60A5FA;
-        color: #111827;
-        font-size: 1em;
-        font-weight: bold;
-        cursor: pointer;
-        transition: all 0.2s ease-in-out;
-      }
-    
-      button.clicked {
-        background-color: #3B82F6 !important;
-        box-shadow: 0 0 10px #3B82F6aa;
-      }
-    
-      textarea {
-        resize: vertical;
-        min-height: 150px;
-      }
-      
-      select {
-        background-color: #111827;
-        color: #F3F4F6;
-        border: none;
-        padding: 10px;
-        font-size: 1em;
-        border-radius: 5px;
-        margin: 10px 0;
-        width: 80%;
-        max-width: 400px;
-        box-shadow: 0 0 0 1px #374151 inset;
-        appearance: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='20' width='20' viewBox='0 0 20 20'><path d='M7 7l3 3 3-3'/></svg>");
-        background-repeat: no-repeat;
-        background-position: right 10px center;
-        background-size: 1em;
-        text-align: center;
-        text-align-last: center;
-      }
-      
-      select:hover {
-        border-color: #F472B6;
-        background-color: #FEF2F2;
-        color: #000000;
-      }
-      
-      select:focus {
-        outline: none;
-        border-color: #EC4899;
-        color: #000000;
-        box-shadow: 0 0 5px rgba(236, 72, 153, 0.5);
-      }
-      
-    #intro {
-      height: 90vh;
-      width: 90vw;
-      background-color: #111827;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      font-family: 'Dancing Script', cursive;
-      color: #60A5FA;
-      text-align: center;
-      gap: 0;
-    }
-    
-    .title-word {
-      display: block;
-      line-height: 1;
-      position: relative;
-    }
-    
-    .title-word.little {
-      top: -1em;
-      left: -0.4em;
-      font-size: 6em;
-    }
-    
-    .title-word.secret {
-      top: -0.8em;
-      left: 0.4em;
-      font-size: 6em;
-    }
+  html, body {
+    height: 100%;       /* nécessaire pour que flex fonctionne sur #start */
+    margin: 0;
+    padding: 0;
+  }
   
-    .title-word.skip {
-      top: 8em;
-      font-size: 1.5em;
-      font-family: 'Segoe UI', sans-serif;
-      color: white;
-      animation: pulse 2s infinite;
-    }
-    
-    .screen {
-      opacity: 0;
-      transition: opacity 0.8s ease-in-out;
-      position: absolute;
-      top: 10;
-      left: 10;
-      width: 100%;
-    }
-    
-    .screen.visible {
-      opacity: 1;
-      position: relative;
-    }
-    
-    .reveal-grid {
-      display: flex;
-      justify-content: space-around;
-      margin-bottom: 20px;
-    }
-    
-    .reveal-col {
-      flex: 1;
-      text-align: center;
-      font-size: 1.2em;
-      font-weight: bold;
-    }
-    
-    .role-setting {
-      display: flex;
-      align-items: center;
-      gap: 2px;
-      margin: 5px 0;
-      margin-left: 50px;
-    }
-    
-    .role-setting button {
-      padding: 1.5px 4px;
-      border: none;
-      border-radius: 4px;
-      background: #60A5FA;
-      color: white;
-      cursor: pointer;
-      font-size: 0.5em;
-    }
-    
-    .role-setting button:hover {
-      background: #60A5FA;
-    }
-    
-    .role-setting button:disabled {
-      background: #d1d5db; /* gris clair */
-      color: #9ca3af;     /* gris foncé */
-      cursor: not-allowed;
-      transform: none;    /* pas d'effet hover */
-    }
-    
-    /* conteneur principal de la liste */
-    #scoreList {
-      padding-left: 0;
-      margin: 0;
-    }
-    
-    .score-row {
-      list-style: none;
-      margin-bottom: 16px;
-      display: flex;
-      justify-content: center; /* centre tout */
-    }
-    
-    .score-wrapper {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;              /* petit espace fixe entre barre et gain */
-    }
-    
-    .score-bar-container {
-      position: relative;
-      background-color: #e6e6e6;
-      border-radius: 12px;
-      height: 24px;
-      width: 300px;          /* largeur fixe */
-      max-width: 60%;        /* responsive */
-      overflow: hidden;
-    }
-    
-    .score-bar {
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 100%;
-      border-radius: 12px 0 0 12px; /* ✅ arrondi uniquement à gauche */
-      background-color: #39A853;
-      transition: width 1600ms ease;
-      z-index: 1;
-    }
-    
-    .score-content {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-      height: 100%;
-      padding: 0 16px;
-      box-sizing: border-box;
-      pointer-events: none;
-      color: #000;
-      font-weight: 700;
-      font-size: 18px;
-    }
-    
-    .score-gain {
-      color: #39A853;
-      font-weight: 700;
-      font-size: 16px;
-      white-space: nowrap;
-    }
-    
-    @keyframes pulse {
-      0% { opacity: 0.9; }
-      50% { opacity: 0.05; }
-      100% { opacity: 0.9; }
-    }
-    
-    #setup, #tableRound, #votePhase, #reveal {
-      display: none;
-      max-width: 600px;
-      margin: auto;
-      background-color: #1F2937;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px #00000088;
-    }
-    #names, #options, #chooseStarter {
-      max-width: 600px;
-      margin: auto;
-      background-color: #1F2937;
-      padding: 10px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px #00000088;
-    }
-
-    #role, #word, #players {
-      font-size: 2em;
-      margin-top: 10px;
-      font-weight: bold;
-    }
-    #timer {
-      color: #FBBF24;
-      font-weight: bold;
-      margin-top: 10px;
-    }
-
+  body {
+    background-color: #111827;
+    color: #F3F4F6;
+    font-family: 'Segoe UI', sans-serif;
+    text-align: center;
+  }
+  
+  /* TITRES */
+  h1, h2, h3 {
+    color: #60A5FA;
+    margin-bottom: 0.5em;
+  }
+  
+  /* LISTES */
+  ul { list-style-type: none; padding: 0; }
+  li { font-size: 1em; margin-top: 15px; }
+  
+  lj { color: #60A5FA; }
+  sc { color: #111827; }
+  
+  /* INPUTS */
+  input[type="number"] {
+    padding: 10px;
+    border-radius: 5px;
+    margin: 5px 0;
+    width: 45%;
+    font-size: 1em;
+    background-color: #1F2937;
+    color: #F3F4F6;
+    text-align: center;
+  }
+  
+  input[type="text"], textarea, modalInput {
+    padding: 5px;
+    border-radius: 5px;
+    margin: 5px 0;
+    width: 45%;
+    font-size: 1em;
+    background-color: #111827;
+    color: #F3F4F6;
+    text-align: center;
+  }
+  
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 80%;
+    height: 8px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    background: #E5E7EB;
+    outline: none;
+    transition: background 0.3s;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: #60A5FA;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+  input[type=range]::-moz-range-thumb {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: #60A5FA;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  input[type=range]::-moz-range-thumb:hover { transform: scale(1.2); }
+  
+  /* BOUTONS */
+  button {
+    padding: 10px 20px;
+    margin: 10px;
+    border-radius: 5px;
+    border: none;
+    background-color: #60A5FA;
+    color: #111827;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+  }
+  button.clicked {
+    background-color: #3B82F6 !important;
+    box-shadow: 0 0 10px #3B82F6aa;
+  }
+  
+  /* TEXTAREA */
+  textarea { resize: vertical; min-height: 150px; }
+  
+  /* SELECTS */
+  select {
+    background-color: #111827;
+    color: #F3F4F6;
+    border: none;
+    padding: 10px;
+    font-size: 1em;
+    border-radius: 5px;
+    margin: 10px 0;
+    width: 80%;
+    max-width: 400px;
+    box-shadow: 0 0 0 1px #374151 inset;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='20' width='20' viewBox='0 0 20 20'><path d='M7 7l3 3 3-3'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 1em;
+    text-align: center;
+    text-align-last: center;
+  }
+  select:hover {
+    border-color: #F472B6;
+    background-color: #FEF2F2;
+    color: #000000;
+  }
+  select:focus {
+    outline: none;
+    border-color: #EC4899;
+    color: #000000;
+    box-shadow: 0 0 5px rgba(236, 72, 153, 0.5);
+  }
+  
+  /* INTRO */
+  #intro {
+    height: 90vh;
+    width: 90vw;
+    background-color: #111827;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-family: 'Dancing Script', cursive;
+    color: #60A5FA;
+    text-align: center;
+    gap: 0;
+  }
+  .title-word { display: block; line-height: 1; position: relative; }
+  .title-word.little { top: -1em; left: -0.4em; font-size: 6em; }
+  .title-word.secret { top: -0.8em; left: 0.6em; font-size: 6em; }
+  .title-word.skip { top: 8em; left: 0.8em; font-size: 1.5em; font-family: 'Segoe UI', sans-serif; color: white; animation: pulse 2s infinite; }
+  
+  /* SCREENS */
+  .screen {
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out;
+    position: absolute;
+    top: 10;
+    left: 10;
+    width: 100%;
+  }
+  .screen.visible {
+    opacity: 1;
+    position: relative;
+  }
+  
+  /* REVEAL */
+  .reveal-grid {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+  }
+  
+  .reveal-col {
+    flex: 1;
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
+  }
+  
+  /* ROLES */
+  .role-setting {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin: 5px 0;
+    margin-left: 50px;
+  }
+  .role-setting button {
+    padding: 1.5px 4px;
+    border: none;
+    border-radius: 4px;
+    background: #60A5FA;
+    color: white;
+    cursor: pointer;
+    font-size: 0.5em;
+  }
+  .role-setting button:disabled {
+    background: #d1d5db;
+    color: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
+  /* TABLEAU DES SCORES */
+  #scoreList { padding-left: 0; margin: 0; }
+  .score-row { list-style: none; margin-bottom: 16px; display: flex; justify-content: center; }
+  .score-wrapper { display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .score-bar-container {
+    position: relative;
+    background-color: #e6e6e6;
+    border-radius: 12px;
+    height: 24px;
+    width: 300px;
+    max-width: 60%;
+    overflow: hidden;
+  }
+  .score-bar {
+    position: absolute;
+    top: 0; left: 0;
+    height: 100%;
+    border-radius: 12px 0 0 12px;
+    background-color: #39A853;
+    transition: width 1600ms ease;
+    z-index: 1;
+  }
+  .score-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%; height: 100%;
+    padding: 0 16px;
+    box-sizing: border-box;
+    pointer-events: none;
+    color: #000;
+    font-weight: 700;
+    font-size: 18px;
+  }
+  .score-gain { color: #39A853; font-weight: 700; font-size: 16px; white-space: nowrap; }
+  
+  /* ANIMATIONS */
+  @keyframes pulse { 0%{opacity:0.9;} 50%{opacity:0.05;} 100%{opacity:0.9;} }
+  
+  /* BLOCS DE JEU */
+  #setup, #tableRound, #votePhase, #reveal {
+    display: none;
+    max-width: 600px;
+    margin: auto;
+    background-color: #1F2937;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #00000088;
+  }
+  #names, #options, #chooseStarter {
+    max-width: 600px;
+    margin: auto;
+    background-color: #1F2937;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #00000088;
+  }
+  #role, #word, #players { font-size: 2em; margin-top: 10px; font-weight: bold; }
+  #timer { color: #FBBF24; font-weight: bold; margin-top: 10px; }
+  
+  /* MENU PRINCIPAL */
+  #start.screen {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;        /* occupe tout l’écran */
+    box-sizing: border-box;
+    position: relative;   /* ⚠️ plus de absolute, sinon flex ne marche pas */
+    padding: 10px;
+  }
+  
+  /* Bloc du bas collé en bas */
+  .bottom-panel {
+    margin-top: auto;     /* pousse tout en bas */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  /* 2 colonnes pour les sélections */
+  .game-settings {
+    display: flex;
+    justify-content: space-between;
+    gap: 1em;
+  }
+  
+  .game-settings div {
+    flex: 1;
+  }
+  
+  /* Boutons */
+  .menu-buttons {
+    display: flex;
+    margin-left: 20px;
+    justify-content: space-between;
+    gap: 1px;
+  }
   </style>
 </head>
 <body>
@@ -370,64 +325,64 @@
   </div>
   
   <div id="start" class="screen" style="display: none;">
-    <h1>Little Secret</h1>
+    <div class="start-main">
+      <h1>Little Secret</h1>
   
-    <p>👤 Nombre de joueurs : <span id="playerCountLabel">5</span></p>
+      <p>👤 Nombre de joueurs : <span id="playerCountLabel">5</span></p>
       <input type="range" id="playerCount" min="3" max="15" value="5"
              oninput="updatePlayerCountLabel(this.value)" onchange="updateRoleDistribution()" />
-    
-      <!-- Rôles affichés sur une seule ligne -->
+  
       <div class="role-setting">
-              <span>🤓 Disciples :</span>
-              <span id="discipleCount">3</span>
-            </div>
-      
+        <span>🤓 Disciples :</span>
+        <span id="discipleCount">3</span>
+      </div>
       <div class="role-setting">
         <span>🫣 Infiltrés :</span>
         <button id="spyMinus" onclick="adjustRole('spy', -1)">−</button>
         <span id="spyCount">1</span>
         <button id="spyPlus" onclick="adjustRole('spy', 1)">+</button>
       </div>
-      
       <div class="role-setting">
         <span>🕵️‍♂️ Journalistes :</span>
         <button id="journalistMinus" onclick="adjustRole('journalist', -1)">−</button>
         <span id="journalistCount">1</span>
         <button id="journalistPlus" onclick="adjustRole('journalist', 1)">+</button>
       </div>
-  
-    <!-- Ligne en 2 colonnes -->
-    <div style="display: flex; justify-content: space-between; gap: 1em; margin-top: 20px;">
-      <div style="flex:1;">
-              <p>🏆 Points nécessaires pour gagner</p>
-              <select id="pointsToWin">
-                <option value="3">3 points</option>
-                <option value="5" selected>5 points</option>
-                <option value="7">7 points</option>
-                <option value="9">9 points</option>
-                <option value="11">11 points</option>
-                <option value="13">13 points</option>
-                <option value="15">15 points</option>
-              </select>
-            </div>
-      <div style="flex:1;">
-        <p>⏳ Temps d'affichage du rôle</p>
-        <select id="displayDuration">
-          <option value="3">3 secondes</option>
-          <option value="5">5 secondes</option>
-          <option value="7">7 secondes</option>
-          <option value="10" selected>10 secondes</option>
-          <option value="15">15 secondes</option>
-          <option value="20">20 secondes</option>
-          <option value="25">25 secondes</option>
-          <option value="30">30 secondes</option>
-        </select>
-      </div>
     </div>
   
-    <div style="display: flex; justify-content: space-between; margin-top: 45px; gap: 1em;">
-      <button onclick="openOptions()">Options</button>
-      <button onclick="prepareNames()">Nouvelle partie</button>
+    <div class="bottom-panel">
+      <div class="game-settings">
+        <div>
+          <p>🏆 Points nécessaires pour gagner</p>
+          <select id="pointsToWin">
+                      <option value="3">3 points</option>
+                      <option value="5" selected>5 points</option>
+                      <option value="7">7 points</option>
+                      <option value="9">9 points</option>
+                      <option value="11">11 points</option>
+                      <option value="13">13 points</option>
+                      <option value="15">15 points</option>
+                    </select>
+        </div>
+        <div>
+          <p>⏳ Temps d'affichage du rôle</p>
+          <select id="displayDuration">
+                      <option value="3">3 secondes</option>
+                      <option value="5">5 secondes</option>
+                      <option value="7">7 secondes</option>
+                      <option value="10" selected>10 secondes</option>
+                      <option value="15">15 secondes</option>
+                      <option value="20">20 secondes</option>
+                      <option value="25">25 secondes</option>
+                      <option value="30">30 secondes</option>
+                    </select>
+        </div>
+      </div>
+  
+      <div class="menu-buttons">
+        <button onclick="openOptions()">Options</button>
+        <button onclick="prepareNames()">Nouvelle partie</button>
+      </div>
     </div>
   </div>
 
