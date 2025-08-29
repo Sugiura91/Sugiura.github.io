@@ -794,6 +794,7 @@
     }
     
     function startDistribution() {
+      stopIntroMusic(); // 🛑 coupe la musique ici
       const startIndex = parseInt(document.getElementById("starterSelect").value, 10);
     
       // Ordre des joueurs à partir du starter choisi
@@ -1234,6 +1235,8 @@
         revealedRoles = [];
         playerNumber = 1;
         firstPlayerIndex = null;
+        playIntroMusic(); // 🎶 relance la musique
+        
         document.getElementById("info").innerText = `Clique sur le bouton ci-dessous pour découvrir ton mot`;
         
       // Affiche l'écran principal
