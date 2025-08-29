@@ -577,9 +577,9 @@
     let roundScores = {};
     let currentAudio = null;
     // 🎶 Musique d'intro (globale)
-    let introMusic = new Audio("sounds/Intro.mp3");
+    let introMusic = new Audio("sounds/fail.mp3");
     introMusic.loop = true;   // boucle infinie
-    introMusic.volume = 0.5;  // volume réglable
+    introMusic.volume = 0.3;  // volume réglable
     
     function playIntroMusic() {
       introMusic.currentTime = 0; // repart du début
@@ -1319,12 +1319,12 @@
     window.addEventListener("load", () => {
       const intro = document.getElementById("intro");
       intro.addEventListener("click", () => {
-      playIntroMusic();
       fadeToStart();
       });
     });
     
     function fadeToStart() {
+      playIntroMusic();
       const intro = document.getElementById("intro");
       const start = document.getElementById("start");
     
