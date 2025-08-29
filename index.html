@@ -952,7 +952,10 @@
                 } else {
                   firstPlayerIndex = null;
                 }
-                return handleVoteSuite();
+                // ⏳ attendre un court instant avant de relancer handleVoteSuite
+                  setTimeout(() => {
+                    handleVoteSuite();
+                  }, 500); // 0.5s = laisse le son démarrer et le modal s'afficher
               });
             }
           });
