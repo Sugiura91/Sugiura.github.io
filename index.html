@@ -530,7 +530,7 @@
     let playerScores = {}; // { nom: score }
     let firstPlayerIndex = null;
     let roundScores = {};
-    let currentAudio = null;
+    let currentMusic = null;
     
     function playMusic(src, loop = true) {
       if (currentMusic) {
@@ -765,7 +765,7 @@
     
     function startDistribution() {
         // Lancer la musique de partie
-        playMusic("sounds/game.mp3", loop = true);
+        playMusic("sounds/game.mp3");
       
       const startIndex = parseInt(document.getElementById("starterSelect").value, 10);
     
@@ -1208,7 +1208,7 @@
         playerNumber = 1;
         firstPlayerIndex = null;
         // Relancer la musique intro
-        playMusic("sounds/Intro.mp3", loop = true);
+        playMusic("sounds/Intro.mp3");
         
         document.getElementById("info").innerText = `Clique sur le bouton ci-dessous pour découvrir ton mot`;
         
@@ -1297,7 +1297,7 @@
     });
     
     function fadeToStart() {
-      playMusic("sounds/Intro.mp3", loop = true);
+      playMusic("sounds/Intro.mp3");
       const intro = document.getElementById("intro");
       const start = document.getElementById("start");
     
