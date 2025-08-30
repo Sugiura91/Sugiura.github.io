@@ -530,7 +530,7 @@
     let playerScores = {}; // { nom: score }
     let firstPlayerIndex = null;
     let roundScores = {};
-    let currentMusic = null;  // référence à la musique en cours
+    /*let currentMusic = null;  // référence à la musique en cours
     let currentMusicSrc = ""; // le chemin du fichier en cours
     
     function playMusic(src, loop = true) {
@@ -563,7 +563,7 @@
       effect.onended = () => {
         currentMusic.volume = 1.0; // retour à la normale
       };
-    }
+    }*/
 
     function getRandomFromArray(array) {
       return array[Math.floor(Math.random() * array.length)];
@@ -767,7 +767,7 @@
     
     function startDistribution() {
       // Lancer la musique de partie
-      playMusic("sounds/game.mp3");
+      //playMusic("sounds/game.mp3");
       
       const startIndex = parseInt(document.getElementById("starterSelect").value, 10);
     
@@ -1210,7 +1210,7 @@
         playerNumber = 1;
         firstPlayerIndex = null;
         // Relancer la musique intro
-        playMusic("sounds/Intro.mp3");
+        //playMusic("sounds/Intro.mp3");
         
         document.getElementById("info").innerText = `Clique sur le bouton ci-dessous pour découvrir ton mot`;
         
@@ -1299,7 +1299,7 @@
     
     // --- Transition intro → menu principal ---
     function fadeToStart() {
-      playMusic("sounds/Intro.mp3");
+      //playMusic("sounds/Intro.mp3");
       const intro = document.getElementById("intro");
       const start = document.getElementById("start");
     
