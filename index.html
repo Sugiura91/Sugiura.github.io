@@ -538,7 +538,7 @@
       }
       currentMusic = new Audio(src);
       currentMusic.loop = loop;
-      currentMusic.volume = 0.5; // volume normal
+      currentMusic.volume = 1.0; // volume normal
       currentMusic.play();
     }
     
@@ -551,7 +551,7 @@
       }
     
       // 🔽 Baisser le volume de la musique
-      currentMusic.volume = 0.2 * currentMusic.volume; // chute drastique
+      currentMusic.volume = 0.2 // chute drastique
     
       const effect = new Audio(src);
       effect.volume = 1.0;
@@ -559,7 +559,7 @@
     
       // ⏳ Quand le son est terminé, restaurer le volume
       effect.onended = () => {
-        currentMusic.volume = 0.5; // retour à la normale
+        currentMusic.volume = 1.0; // retour à la normale
       };
     }
 
