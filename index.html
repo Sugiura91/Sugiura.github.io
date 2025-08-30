@@ -548,7 +548,7 @@
     
       currentMusic = new Audio(src);
       currentMusic.loop = loop;
-      currentMusic.volume = 1.0;
+      currentMusic.volume = 0.2;
       currentMusicSrc = src;
       currentMusic.play();
     }
@@ -556,24 +556,7 @@
     function playSound(src) {
       const effect = new Audio(src);
       effect.volume = 1.0;
-    
-      if (currentMusic) {
-        if (activeEffects === 0) {
-          currentMusic.volume = 0.2; // 🔽 baisse uniquement au premier effet
-        }
-        activeEffects++;
-      }
-    
       effect.play();
-    
-      effect.onended = () => {
-        if (currentMusic) {
-          activeEffects--;
-          if (activeEffects <= 0) {
-            currentMusic.volume = 1.0; // 🔊 restaurer seulement quand tous les sons sont finis
-          }
-        }
-      };
     }
 
     function getRandomFromArray(array) {
