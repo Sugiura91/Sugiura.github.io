@@ -532,6 +532,7 @@
     let roundScores = {};
     let currentMusic = null;  // l'objet Audio en cours
     let currentMusicSrc = ""; // le chemin du fichier en cours
+    let activeEffects = 0; // combien d'effets sonores jouent en même temps
     
     function playMusic(src, loop = true) {
       // 🎵 Si la même musique est déjà en cours → ne rien faire
@@ -553,23 +554,25 @@
     }
     
     function playSound(src) {
-      if (!currentMusic) {
-        // Pas de musique → juste jouer le son normalement
-        const effect = new Audio(src);
-        effect.play();
-        return;
-      }
-    
-      // 🔽 Baisser le volume de la musique
-      currentMusic.volume = 0.2 // chute drastique
-    
       const effect = new Audio(src);
       effect.volume = 1.0;
+    
+      if (currentMusic) {
+        if (activeEffects === 0) {
+          currentMusic.volume = 0.2; // 🔽 baisse uniquement au premier effet
+        }
+        activeEffects++;
+      }
+    
       effect.play();
     
-      // ⏳ Quand le son est terminé, restaurer le volume
       effect.onended = () => {
-        currentMusic.volume = 1.0; // retour à la normale
+        if (currentMusic) {
+          activeEffects--;
+          if (activeEffects <= 0) {
+            currentMusic.volume = 1.0; // 🔊 restaurer seulement quand tous les sons sont finis
+          }
+        }
       };
     }
 
