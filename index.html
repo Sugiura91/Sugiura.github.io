@@ -548,7 +548,7 @@
     
       currentMusic = new Audio(src);
       currentMusic.loop = loop;
-      currentMusic.volume = 0.01;
+      currentMusic.volume = 0;
       currentMusicSrc = src;
       currentMusic.play();
     }
@@ -570,7 +570,7 @@
         if (currentMusic) {
           activeEffects--;
           if (activeEffects <= 0) {
-            currentMusic.volume = 0.01; // 🔊 restaurer seulement quand tous les sons sont finis
+            currentMusic.volume = 0; // 🔊 restaurer seulement quand tous les sons sont finis
           }
         }
       };
