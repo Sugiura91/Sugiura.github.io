@@ -49,7 +49,7 @@
     text-align: center;
   }
   
-  input[type="text"], textarea { 
+  input[type="text"], textarea, modalInput { 
     padding: 5px;
     border-radius: 5px;
     margin: 5px 0;
@@ -59,35 +59,6 @@
     color: #F3F4F6;
     text-align: center;
   }
-  
-  input[type=range] {
-    -webkit-appearance: none;
-    width: 80%;
-    height: 8px;
-    margin-bottom: 20px;
-    border-radius: 5px;
-    background: #E5E7EB;
-    outline: none;
-    transition: background 0.3s;
-  }
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 20px; height: 20px;
-    border-radius: 50%;
-    background: #60A5FA;
-    cursor: pointer;
-    transition: transform 0.2s;
-  }
-  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
-  input[type=range]::-moz-range-thumb {
-    width: 20px; height: 20px;
-    border-radius: 50%;
-    background: #60A5FA;
-    cursor: pointer;
-    transition: transform 0.2s;
-  }
-  input[type=range]::-moz-range-thumb:hover { transform: scale(1.2); }
   
   /* BOUTONS */
   button {
@@ -931,11 +902,11 @@
             if (guess && guess.toLowerCase() === motSecret.toLowerCase()) {
               eliminated.guessSuccess = true;
               showModal("🎉 Bonne réponse !<br><br>Victoire du journaliste !", false, () => {});
-              playSound("sounds/success.mp3");
+              //playSound("sounds/success.mp3");
               return endVotePhase();
             } else {
               // ❌ Mauvaise réponse → on élimine le journaliste
-              playSound("sounds/fail.mp3");
+              //playSound("sounds/fail.mp3");
               showModal("❌ Mauvaise réponse ! ❌ <br><br>Le journaliste a été découvert !", false, () => {
                 currentPlayers.splice(index, 1);
                 eliminatedPlayers.push(eliminated);
@@ -982,7 +953,7 @@
         if (autre.role === "🫣 Infiltré") {
           // ➡️ infiltré gagne
           showModal("📉 Il reste encore 1 infiltré parmi les 2 joueurs restants.<br><br> Victoire de l'infiltré !", false, endVotePhase("infiltrés"));
-          playSound("sounds/spy_win.mp3");
+          //playSound("sounds/spy_win.mp3");
           return;
         }
     
@@ -992,10 +963,10 @@
             if (guess && guess.toLowerCase() === motSecret.toLowerCase()) {
               autre.guessSuccess = true;
               showModal("🎉 Bonne réponse !<br><br>Victoire du journaliste !", false, endVotePhase("journalistes"));
-              playSound("sounds/success.mp3");
+              //playSound("sounds/success.mp3");
             } else {
               showModal("❌ Mauvaise réponse !<br><br>Victoire du disciple !", false, endVotePhase("disciples"));
-              playSound("sounds/fail.mp3");
+              //playSound("sounds/fail.mp3");
             }
           });
           return;
@@ -1005,21 +976,21 @@
       // Cas 2 : Tous les infiltrés éliminés ET tous les journalistes éliminés → disciples gagnent
       if (infiltrés.length === 0 && journalistes.length === 0) {
         showModal("Tous les journalistes et infiltrés sont éliminés !<br><br>Victoire des disciples !", false, endVotePhase);
-        playSound("sounds/disciple_win.mp3");
+        //playSound("sounds/disciple_win.mp3");
         return;
       }
     
       // Cas 3 : Tous les disciples éliminés → infiltrés gagnent
       if (disciples.length === 0 && infiltrés.length > 0) {
         showModal("Tous les disciples sont éliminés !<br><br>Victoire des infiltrés !", false, endVotePhase);
-        playSound("sounds/spy_win.mp3");
+        //playSound("sounds/spy_win.mp3");
         return;
       }
     
       // Cas 4 : Plus d’infiltrés ET plus de disciples → seuls journalistes restants
       if (infiltrés.length === 0 && disciples.length === 0 && journalistes.length > 0) {
         showModal("Tous les infiltrés et disciples sont éliminés !<br><br>Victoire des journalistes !", false, endVotePhase);
-        playSound("sounds/journalist_win.mp3");
+        //playSound("sounds/journalist_win.mp3");
         return;
       }
     
@@ -1168,7 +1139,7 @@
         const message = winners.length === 1
           ? `${winners[0]} a gagné la partie ! 🎉`
           : `🏆 Les gagnants sont : ${winners.join(", ")} !`;
-        playSound("sounds/victory.mp3");
+        //playSound("sounds/victory.mp3");
     
         if (replayBtn) replayBtn.style.display = "none";
         showModal(message, false, () => {});
