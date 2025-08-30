@@ -49,7 +49,7 @@
     text-align: center;
   }
   
-  input[type="text"], textarea, modalInput {
+  input[type="text"], textarea { 
     padding: 5px;
     border-radius: 5px;
     margin: 5px 0;
@@ -167,14 +167,17 @@
   /* SCREENS */
   .screen {
     opacity: 0;
+    pointer-events: none;   /* invisible + non interactif */
     transition: opacity 0.8s ease-in-out;
     position: absolute;
-    top: 10;
-    left: 10;
+    top: 0;
+    left: 0;
     width: 100%;
   }
+  
   .screen.visible {
     opacity: 1;
+    pointer-events: auto;   /* redevient cliquable */
     position: relative;
   }
   
