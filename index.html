@@ -530,49 +530,38 @@
     let playerScores = {}; // { nom: score }
     let firstPlayerIndex = null;
     let roundScores = {};
-    let currentMusic = null;  // l'objet Audio en cours
+    let currentMusic = null;  // référence à la musique en cours
     let currentMusicSrc = ""; // le chemin du fichier en cours
-    let activeEffects = 0; // combien d'effets sonores jouent en même temps
     
     function playMusic(src, loop = true) {
-      // 🎵 Si la même musique est déjà en cours → ne rien faire
       if (currentMusic && currentMusicSrc === src && !currentMusic.paused) {
-        return;
-      }
-    
-      // Sinon → arrêter l’ancienne et lancer la nouvelle
-      if (currentMusic) {
         currentMusic.pause();
-        currentMusic = null;
       }
-    
       currentMusic = new Audio(src);
       currentMusic.loop = loop;
-      currentMusic.volume = 0;
+      currentMusic.volume = 1.0; // volume normal
       currentMusicSrc = src;
       currentMusic.play();
     }
     
     function playSound(src) {
-      const effect = new Audio(src);
-      effect.volume = 1.0;
-    
-      if (currentMusic) {
-        if (activeEffects === 0) {
-          currentMusic.volume = 0.2; // 🔽 baisse uniquement au premier effet
-        }
-        activeEffects++;
+      if (!currentMusic) {
+        // Pas de musique → juste jouer le son normalement
+        const effect = new Audio(src);
+        effect.play();
+        return;
       }
     
+      // 🔽 Baisser le volume de la musique
+      currentMusic.volume = 0.2; // chute drastique
+    
+      const effect = new Audio(src);
+      effect.volume = 1.0;
       effect.play();
     
+      // ⏳ Quand le son est terminé, restaurer le volume
       effect.onended = () => {
-        if (currentMusic) {
-          activeEffects--;
-          if (activeEffects <= 0) {
-            currentMusic.volume = 0; // 🔊 restaurer seulement quand tous les sons sont finis
-          }
-        }
+        currentMusic.volume = 1.0; // retour à la normale
       };
     }
 
@@ -777,10 +766,8 @@
     }
     
     function startDistribution() {
-        // Lancer la musique de partie
-        /*playMusic("sounds/game.mp3");*/
-        currentMusic.pause();
-        currentMusic = null;
+      // Lancer la musique de partie
+      playMusic("sounds/game.mp3");
       
       const startIndex = parseInt(document.getElementById("starterSelect").value, 10);
     
