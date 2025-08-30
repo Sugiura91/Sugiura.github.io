@@ -1249,21 +1249,20 @@
       }
     }
     
-    window.onload = function () {
-    // Récupère le pointsToWin sauvegardé
+    window.addEventListener("load", () => {
+      // --- 🔹 1. Restaurer les paramètres sauvegardés ---
       const savedPoints = localStorage.getItem("pointsToWin");
       if (savedPoints) {
         document.getElementById("pointsToWin").value = savedPoints;
       }
     
-      // Ajoute un listener pour sauvegarder dès qu’on change la valeur
-      document.getElementById("pointsToWin").addEventListener("change", function() {
+      document.getElementById("pointsToWin").addEventListener("change", function () {
         localStorage.setItem("pointsToWin", this.value);
       });
-      
+    
       const savedCustomD = localStorage.getItem("customDisciples");
       const savedCustomI = localStorage.getItem("customInfiltrees");
-      
+    
       if (savedCustomD && savedCustomI) {
         try {
           wordLists.personnalisée.disciples = JSON.parse(savedCustomD);
@@ -1272,46 +1271,47 @@
           console.warn("Erreur lors du chargement des mots personnalisés", e);
         }
       }
-      
+    
       const savedDifficulty = localStorage.getItem("selectedDifficulty");
       if (savedDifficulty && wordLists[savedDifficulty]) {
         selectedDifficulty = savedDifficulty;
       }
-      
-    };
     
-    window.onload = () => {
-      updateRoleDistribution(); // initialise les valeurs + boutons au lancement
-    };
+      // --- 🔹 2. Initialiser la distribution des rôles ---
+      updateRoleDistribution();
     
-    document.querySelectorAll("button").forEach(btn => {
-      btn.addEventListener("click", () => {
-        btn.classList.add("clicked");
-        setTimeout(() => btn.classList.remove("clicked"), 150);
+      // --- 🔹 3. Ajouter les effets visuels aux boutons ---
+      document.querySelectorAll("button").forEach(btn => {
+        btn.addEventListener("click", () => {
+          btn.classList.add("clicked");
+          setTimeout(() => btn.classList.remove("clicked"), 150);
+        });
       });
-    });
     
-    window.addEventListener("load", () => {
+      // --- 🔹 4. Gérer l’écran d’intro ---
       const intro = document.getElementById("intro");
-      intro.addEventListener("click", () => {
-      fadeToStart();
-      });
+      if (intro) {
+        intro.addEventListener("click", () => {
+          fadeToStart();
+        });
+      }
     });
     
+    // --- Transition intro → menu principal ---
     function fadeToStart() {
-      /*playMusic("sounds/Intro.mp3");*/
+      playMusic("sounds/Intro.mp3");
       const intro = document.getElementById("intro");
       const start = document.getElementById("start");
     
-      intro.classList.remove("visible");
-      start.style.display = "block";
+      if (intro) intro.classList.remove("visible");
+      if (start) start.style.display = "block";
     
       setTimeout(() => {
-        start.classList.add("visible");
+        if (start) start.classList.add("visible");
       }, 800);
     
       setTimeout(() => {
-        intro.style.display = "none";
+        if (intro) intro.style.display = "none";
       }, 800);
     }
     
