@@ -531,12 +531,37 @@
     let firstPlayerIndex = null;
     let roundScores = {};
     let currentAudio = null;
-    const introMusic = new Audio("sounds/Intro.mp3");
-    introMusic.loop = true;
-    introMusic.volume = 0.5;
-    const gameMusic = new Audio("sounds/game.mp3");
-    gameMusic.loop = true;
-    gameMusic.volume = 0.5;
+    
+    function playMusic(src, loop = true) {
+      if (currentMusic) {
+        currentMusic.pause();
+      }
+      currentMusic = new Audio(src);
+      currentMusic.loop = loop;
+      currentMusic.volume = 0.5; // volume normal
+      currentMusic.play();
+    }
+    
+    function playSound(src) {
+      if (!currentMusic) {
+        // Pas de musique → juste jouer le son normalement
+        const effect = new Audio(src);
+        effect.play();
+        return;
+      }
+    
+      // 🔽 Baisser le volume de la musique
+      currentMusic.volume = 0.2 * currentMusic.volume; // chute drastique
+    
+      const effect = new Audio(src);
+      effect.volume = 1.0;
+      effect.play();
+    
+      // ⏳ Quand le son est terminé, restaurer le volume
+      effect.onended = () => {
+        currentMusic.volume = 0.5; // retour à la normale
+      };
+    }
 
     function getRandomFromArray(array) {
       return array[Math.floor(Math.random() * array.length)];
@@ -739,13 +764,8 @@
     }
     
     function startDistribution() {
-      // Stopper l’intro
-        introMusic.pause();
-        introMusic.currentTime = 0;
-      
         // Lancer la musique de partie
-        gameMusic.currentTime = 0;
-        gameMusic.play()
+        playMusic("sounds/game.mp3", loop = true);
       
       const startIndex = parseInt(document.getElementById("starterSelect").value, 10);
     
@@ -1187,13 +1207,8 @@
         revealedRoles = [];
         playerNumber = 1;
         firstPlayerIndex = null;
-        // Stopper la musique de jeu
-          gameMusic.pause();
-          gameMusic.currentTime = 0;
-        
-          // Relancer la musique intro
-          introMusic.currentTime = 0;
-          introMusic.play()
+        // Relancer la musique intro
+        playMusic("sounds/Intro.mp3", loop = true);
         
         document.getElementById("info").innerText = `Clique sur le bouton ci-dessous pour découvrir ton mot`;
         
@@ -1282,7 +1297,7 @@
     });
     
     function fadeToStart() {
-      introMusic.play();
+      playMusic("sounds/Intro.mp3", loop = true);
       const intro = document.getElementById("intro");
       const start = document.getElementById("start");
     
@@ -1321,16 +1336,6 @@
         }
       }
       modalCallback = null;
-    }
-    
-    function playSound(path) {
-      if (currentAudio) {
-        currentAudio.pause();
-        currentAudio.currentTime = 0;
-      }
-      currentAudio = new Audio(path);
-      currentAudio.volume = 0.7;
-      currentAudio.play();
     }
           
   </script>
